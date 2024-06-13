@@ -7,7 +7,6 @@
 
 <script>
 import Header from "@/components/HeaderComp";
-
 export default {
   name: "App",
   components: {

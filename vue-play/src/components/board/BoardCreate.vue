@@ -60,7 +60,7 @@ export default {
       });
 
       this.$router.push({
-        path: "/",
+        path: "/board",
       });
     },
     updateContent() {
@@ -68,12 +68,12 @@ export default {
       this.updateObject.title = this.subject;
       this.updateObject.context = this.context;
       this.$router.push({
-        path: "/",
+        path: "/board",
       });
     },
     cancle() {
       this.$router.push({
-        path: "/",
+        path: "/board",
       });
     },
   },

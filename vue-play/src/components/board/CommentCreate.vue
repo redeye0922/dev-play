@@ -52,7 +52,6 @@ export default {
         updated_at: null,
       });
       this.reloadComment();
-      // this.subCommentToggle();
       this.context = "";
     },
     createSubComment() {

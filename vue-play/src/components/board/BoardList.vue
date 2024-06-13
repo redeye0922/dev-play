@@ -42,7 +42,6 @@ export default {
     return {
       currentPage: 1, // 현재 페이지
       perPage: 10, // 페이지당 보여줄 갯수
-      // bootstrap 'b-table' 필드 설정
       fields: [
         {
           key: "content_id",
@@ -66,9 +65,11 @@ export default {
   },
   methods: {
     rowClick(item) {
-      this.$router.push({
-        path: `/board/detail/${item.content_id}`,
-      });
+      this.$router
+        .push({
+          path: `/board/detail/${item.content_id}`,
+        })
+        .catch(() => {});
     },
     writeContent() {
       this.$router.push({

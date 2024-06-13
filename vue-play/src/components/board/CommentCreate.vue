@@ -36,7 +36,7 @@ export default {
   },
   data() {
     return {
-      name: "인성",
+      name: "테스트",
       context: "",
     };
   },

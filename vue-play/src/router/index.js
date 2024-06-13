@@ -4,6 +4,8 @@ import BoardList from "@/components/board/BoardList";
 import BoardDetail from "@/components/board/BoardDetail";
 import BoardCreate from "@/components/board/BoardCreate";
 
+import Calculator from "@/components/CalculatorComp";
+
 import NotFound from "@/components/NotFound";
 
 Vue.use(VueRouter); // 뷰 어플리케이션에 라우터 플러그인을 추가한다.
@@ -14,6 +16,11 @@ export default new VueRouter({
   routes: [
     {
       path: "/",
+      name: "Calculator",
+      component: Calculator,
+    },
+    {
+      path: "/board",
       name: "BoardList",
       component: BoardList,
     },

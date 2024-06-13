@@ -58,7 +58,7 @@ export default {
       );
       data.Content.splice(content_index, 1); // 데이터 삭제
       this.$router.push({
-        path: "/",
+        path: "/board",
       });
     },
     updateData() {
@@ -80,7 +80,6 @@ export default {
 }
 
 .content-detail-content-info-left {
-  width: 720px;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -89,7 +88,6 @@ export default {
 }
 
 .content-detail-content-info-right {
-  width: 300px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -101,7 +99,7 @@ export default {
   border: 1px solid black;
   margin-top: 1rem;
   padding-top: 1rem;
-  min-height: 720px;
+  min-height: 300px;
 }
 
 .content-detail-button {

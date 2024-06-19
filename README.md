@@ -8,3 +8,6 @@ this.$router.push('path') 뒤에 <b>.catch(() => {});</b>를 붙혀서 에러 �
 
 # 계산기 추가
 router url "/" 를 계산기 화면으로 기존 "/"는 "/board"로 변경하여 처음화면에 계산기를 추가하였다
+
+# 레이아웃 변경
+Header 수정, Footer 추가

@@ -1,16 +1,21 @@
 <template>
   <div id="app">
-    <Header />
-    <router-view />
+    <b-container>
+      <Header />
+      <router-view />
+      <Footer />
+    </b-container>
   </div>
 </template>
 
 <script>
 import Header from "@/components/HeaderComp";
+import Footer from "@/components/FooterComp";
 export default {
   name: "App",
   components: {
     Header,
+    Footer,
   },
 };
 </script>

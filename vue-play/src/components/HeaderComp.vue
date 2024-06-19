@@ -8,7 +8,6 @@
           <b-icon v-else icon="chevron-bar-down"></b-icon>
         </template>
       </b-navbar-toggle>
-
       <b-collapse id="navbar-toggle-collapse" is-nav>
         <b-navbar-nav class="ml-auto">
           <b-nav-item to="/" @click="navClick">메인페이지</b-nav-item>

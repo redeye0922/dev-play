@@ -2,9 +2,6 @@
 프론트 개발 공간 
 
 # vue-play 추가
-
-# svelte-play 추가
-
 # vue-router 화면이동시 에러 발생 (상세화면 이동시)
 router.push('path') 화면 이동시 에러발생
 this.$router.push('path') 뒤에 <b>.catch(() => {});</b>를 붙혀서 에러 해결
@@ -14,3 +11,7 @@ router url "/" 를 계산기 화면으로 기존 "/"는 "/board"로 변경하여
 
 # 레이아웃 변경
 Header 수정, Footer 추가
+
+
+# svelte-play 추가
+투토리얼 기준으로 mix해서 만들기

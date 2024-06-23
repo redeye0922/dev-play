@@ -36,6 +36,6 @@ import { beforeUpdate, afterUpdate } from 'svelte';
 	}
 
 	button {
-		background-image: url(remove.svg);
+		background-image: url(./remove.svg);
 	}
 </style>

@@ -85,7 +85,7 @@
 		scroll-behavior: smooth;
 	}
 	
-@media (min-width: 400px) {
+@media (min-width: 260px) {
 	.phone {
 		background: var(--bg-2);
 		position: relative;

@@ -4,6 +4,10 @@ pipeline {
             DEPLOY_DIR = "/home/testdev/devspace"
             SERVER_IP = "172.29.231.196"
         }
+        triggers {
+          //GitHub webhook을 통한 자동 트리거
+          githubPush()
+        }        
         stages {
             stage('Checkout') {
                 steps {
@@ -59,6 +63,14 @@ pipeline {
                         ssh testdev@${SERVER_IP} "cd ${DEPLOY_DIR} && npm install --production && pm2 start server.js"
                         '''
                     }
+                }
+            }
+            stage('Verify Application') {
+                steps {
+                        script {
+                                echo '애플리케이션 상태 확인중 ...'
+                                sh 'ssh testdev@${SERVER_IP} "pm2 status"'
+                        }
                 }
             }
         }

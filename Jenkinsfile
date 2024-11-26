@@ -8,11 +8,13 @@ pipeline {
             stage('Checkout') {
                 steps {
                     // GitHub 리포지토리에서 코드 가져오기
+                    echo 'GitHub 저장소에서 코드가져오기'
                     git 'https://github.com/redeye0922/dev-play.git'
                 }
             }
             stage('Remove swagger-play') {
                 steps {
+                    echo '필요없는 폴더정리'
                     sh 'rm -rf swagger-play'  // swagger-play 디렉토리 삭제
                 }
             }
@@ -20,6 +22,7 @@ pipeline {
                 steps {
                     dir('vue-play') {
                         script {
+                          echo '의존성 설치 중...'
                           // Node.js 및 npm 의존성 설치
                           sh 'npm install'
                         }
@@ -30,6 +33,7 @@ pipeline {
                 steps {
                     dir('vue-play') {
                         script {
+                            echo 'Vue 앱 빌드 중...'
                             // Vue 프로젝트 빌드
                             sh 'npm run build'
                         }
@@ -39,6 +43,7 @@ pipeline {
             stage('Deploy') {
                 steps {
                     script {
+                        echo '배포 중...'
                         // 서버로 배포 (scp 또는 rsync 사용)
                         sh '''
                         scp -r vue-play/dist/* testdev@${SERVER_IP}:${DEPLOY_DIR}

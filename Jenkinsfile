@@ -11,19 +11,28 @@ pipeline {
                     git 'https://github.com/redeye0922/dev-play.git'
                 }
             }
+            stage('Remove swagger-play') {
+                steps {
+                    sh 'rm -rf swagger-play'  // swagger-play 디렉토리 삭제
+                }
+            }
             stage('Install Dependencies') {
                 steps {
-                    script {
-                        // Node.js 및 npm 의존성 설치
-                        sh 'npm install'
+                    dir('vue-play') {
+                        script {
+                          // Node.js 및 npm 의존성 설치
+                          sh 'npm install'
+                        }
                     }
                 }
             }
             stage('Build') {
                 steps {
-                    script {
-                        // Vue 프로젝트 빌드
-                        sh 'npm run build'
+                    dir('vue-play') {
+                        script {
+                            // Vue 프로젝트 빌드
+                            sh 'npm run build'
+                        }
                     }
                 }
             }
@@ -32,7 +41,7 @@ pipeline {
                     script {
                         // 서버로 배포 (scp 또는 rsync 사용)
                         sh '''
-                        scp -r dist/* testdev@${SERVER_IP}:${DEPLOY_DIR}
+                        scp -r vue-play/dist/* testdev@${SERVER_IP}:${DEPLOY_DIR}
                         '''
                     }
                 }

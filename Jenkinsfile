@@ -8,7 +8,7 @@ pipeline {
         DOCKER_REGISTRY = "redeye0922"  // Docker Hub 또는 사설 레지스트리
         DOCKER_IMAGE_TAG = "${GIT_COMMIT}"
         DOCKER_USERNAME="redeye0922"
-        DOCKER_PASSWORD="**jh7425**
+        DOCKER_PASSWORD="**jh7425**"
     }
 
     triggers {

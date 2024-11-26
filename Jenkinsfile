@@ -1,7 +1,7 @@
 pipeline {
         agent any
         environment {
-            DEPLOY_DIR = "/home/devspace"
+            DEPLOY_DIR = "/home/testdev/devspace"
             SERVER_IP = "172.29.231.196"
         }
         stages {

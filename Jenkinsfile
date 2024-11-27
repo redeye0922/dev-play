@@ -105,7 +105,7 @@ pipeline {
                     COPY --from=build-stage /app/vue-play/dist /app
                     
                     # 11. serve로 정적 파일 서빙
-                    CMD ["serve", "-s", ".", "-l", "3000"]
+                    CMD ["serve", "-s", ".", "-l", "0.0.0.0:3000"]
                     
                     # 12. 3000 포트 노출
                     EXPOSE 3000
@@ -169,8 +169,8 @@ pipeline {
                         docker stop \$(docker ps -q --filter name=${IMAGE_NAME}) &&
                         docker rm \$(docker ps -aq --filter name=${IMAGE_NAME}) &&
                         
-                        # 새로운 컨테이너 실행
-                        docker run -d --name ${IMAGE_NAME} -p 80:80 ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG}
+                         # 새로운 컨테이너 실행 (3000 포트 매핑)
+                        docker run -d --name ${IMAGE_NAME} -p 3000:3000 ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG}
                     "
                     '''
                 }

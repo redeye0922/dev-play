@@ -102,7 +102,7 @@ pipeline {
                     RUN npm install -g serve
                     
                     # 10. 빌드된 파일을 production-stage로 복사
-                    COPY --from=build-stage /app/dist /app
+                    COPY --from=build-stage /app/vue-play/dist /app
                     
                     # 11. serve로 정적 파일 서빙
                     CMD ["serve", "-s", ".", "-l", "3000"]

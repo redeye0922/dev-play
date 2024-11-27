@@ -8,10 +8,7 @@ pipeline {
         DOCKER_REGISTRY = "redeye0922"  // Docker Hub 또는 사설 레지스트리
         DOCKER_IMAGE_TAG = "${GIT_COMMIT}"
         DOCKER_USERNAME = "redeye0922"
-        DOCKER_PASSWORD = "**jh7425**"
-        DOCKER_CLI_EXPERIMENTAL = 'enabled' // Docker에서 네트워크 요청이 지연되는 문제 해결에 도움됨
-        DOCKER_BUILDKIT = '1'  // BuildKit 활성화
-        COMPOSE_DOCKER_CLI_BUILD = '1'  // Compose와 Docker CLI 빌드를 위한 설정
+        DOCKER_PASSWORD = "**jh7425**"       
     }
 
     triggers {

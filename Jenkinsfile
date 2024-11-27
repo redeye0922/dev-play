@@ -87,7 +87,7 @@ pipeline {
                     RUN npm install
                     
                     # 5. vue-play 폴더의 소스 코드 복사
-                    COPY ./vue-play/ .  
+                    COPY . .  
                     
                     # 6. Vue.js 프로젝트 빌드
                     RUN npm run build

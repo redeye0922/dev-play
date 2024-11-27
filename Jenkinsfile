@@ -113,6 +113,14 @@ pipeline {
             }
         }
 
+        stage('Check Build Docker Image Exec Workspace') {
+            steps {
+                script {
+                    echo "Docker 이미지 빌드 경로: ${pwd()}"
+                }
+            }
+        }
+        
         stage('Build Docker Image') {
             steps {
                 script {
@@ -121,7 +129,7 @@ pipeline {
                     //# Docker Hub에서 캐시된 이미지를 가져옵니다. (기존에 푸시된 이미지 사용)
                     //docker pull ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} || true
                     sh '''                   
-                    # 캐시를 활용한 Docker 빌드
+                    # Docker 빌드 실행
                     docker build -t ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} .                    
                     '''
                 }

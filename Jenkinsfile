@@ -9,6 +9,9 @@ pipeline {
         DOCKER_IMAGE_TAG = "${GIT_COMMIT}"
         DOCKER_USERNAME = "redeye0922"
         DOCKER_PASSWORD = "**jh7425**"
+        DOCKER_CLI_EXPERIMENTAL = 'enabled' // Docker에서 네트워크 요청이 지연되는 문제 해결에 도움됨
+        DOCKER_BUILDKIT = '1'  // BuildKit 활성화
+        COMPOSE_DOCKER_CLI_BUILD = '1'  // Compose와 Docker CLI 빌드를 위한 설정
     }
 
     triggers {
@@ -134,12 +137,11 @@ pipeline {
             steps {
                 script {
                     echo 'Docker 이미지 빌드 중...'
-                    // Docker 이미지를 빌드할 때 --cache-from 옵션을 사용하여 캐시된 이미지를 활용
-                    //# Docker Hub에서 캐시된 이미지를 가져옵니다. (기존에 푸시된 이미지 사용)
-                    //docker pull ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} || true
+                    // Docker 이미지를 빌드할 때 --no-cache 옵션을 사용하여 캐시문제 배제  
+                    // timeout:1200 : 20분으로 세팅
                     sh '''                   
                     # Docker 빌드 실행
-                    docker build -t ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} .                    
+                    docker build --no-cache --build-arg BUILDKIT_INLINE_CACHE=1 --timeout=1200 -t ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} .                    
                     '''
                 }
             }

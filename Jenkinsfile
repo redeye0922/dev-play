@@ -78,19 +78,19 @@ pipeline {
                     RUN npm run build
 
                     # 7. Nginx를 이용한 정적 파일 서빙
-                    FROM nginx:alpine AS production-stage
+                    FROM node:18-slim AS production-stage
 
-                    # 8. 빌드된 파일을 Nginx의 HTML 폴더에 복사
-                    COPY --from=build-stage /app/dist /usr/share/nginx/html
+                    # 8. serve 패키지 설치
+                    RUN npm install -g serve
 
-                    # 9. Nginx 설정을 기본 설정으로 사용
-                    COPY ./nginx.conf /etc/nginx/nginx.conf
+                    # 9. 빌드된 파일을 production-stage로 복사
+                    COPY --from=build-stage /app/dist /app
 
-                    # 10. Nginx 컨테이너 시작
-                    CMD ["nginx", "-g", "daemon off;"]
+                    # 10. serve로 정적 파일 서빙
+                    CMD ["serve", "-s", ".", "-l", "3000"]
 
-                    # 11. 80 포트 노출 (Nginx 기본 포트)
-                    EXPOSE 80
+                    # 11. 3000 포트 노출
+                    EXPOSE 3000
                     """
                     // Jenkins 워크스페이스에 Dockerfile 생성
                     writeFile(file: 'Dockerfile', text: dockerfileContent)

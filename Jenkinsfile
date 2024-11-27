@@ -2,32 +2,42 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = 'redeye0922/my-vue-app'
-        REMOTE_HOST = '172.29.231.196'
-        REMOTE_USER = 'testdev'
-        REMOTE_PATH = '/home/testdev/devspace'
+        DEPLOY_DIR = "/home/testdev/devspace"
+        SERVER_IP = "172.29.231.196"
+        IMAGE_NAME = "my-vue-app"
+        DOCKER_REGISTRY = "redeye0922"  // Docker Hub 또는 사설 레지스트리
+        DOCKER_IMAGE_TAG = "${GIT_COMMIT}"
+        DOCKER_USERNAME="redeye0922"
+        DOCKER_PASSWORD="**jh7425**"
+    }
+
+    triggers {
+        githubPush()  // GitHub webhook을 통해 자동 트리거
     }
 
     stages {
         stage('Checkout') {
             steps {
                 echo 'GitHub에서 코드 체크아웃 중...'
+                git 'https://github.com/redeye0922/dev-play.git'  // 공개 리포지토리, 인증 필요 없음
                 checkout scm
             }
         }
 
         stage('Remove swagger-play') {
             steps {
-                echo 'swagger-play 디렉토리 삭제 중...'
-                sh 'rm -rf swagger-play'
+                echo '불필요한 swagger-play 폴더 삭제 중...'
+                sh 'rm -rf swagger-play'  // 불필요한 디렉토리 삭제
             }
         }
 
         stage('Install Dependencies') {
             steps {
                 dir('vue-play') {
-                    echo 'npm 의존성 설치 중...'
-                    sh 'npm install'
+                    script {
+                        echo 'npm 의존성 설치 중...'
+                        sh 'npm install'  // 의존성 설치
+                    }
                 }
             }
         }
@@ -35,94 +45,74 @@ pipeline {
         stage('Build Vue App') {
             steps {
                 dir('vue-play') {
-                    echo 'Vue 앱 빌드 중...'
-                    sh 'npm run build'
-                }
-            }
-        }
-
-        stage('Generate Dockerfile') {
-            steps {
-                echo 'Dockerfile 생성 중...'
-                script {
-                    def dockerfileContent = """
-                    # 1. Node.js 기반 이미지를 사용하여 Vue.js 빌드
-                    FROM node:18 AS build-stage
-
-                    # 2. 작업 디렉토리 설정
-                    WORKDIR /app
-
-                    # 3. Vue 프로젝트의 종속성 파일 복사
-                    COPY package*.json ./
-
-                    # 4. 종속성 설치
-                    RUN npm install
-
-                    # 5. 프로젝트 소스 복사
-                    COPY . .
-
-                    # 6. Vue.js 프로젝트 빌드
-                    RUN npm run build
-
-                    # 7. Nginx를 이용한 정적 파일 서빙
-                    FROM nginx:alpine AS production-stage
-
-                    # 8. 빌드된 파일을 Nginx의 HTML 폴더에 복사
-                    COPY --from=build-stage /app/dist /usr/share/nginx/html
-
-                    # 9. Nginx 설정을 기본 설정으로 사용
-                    COPY ./nginx.conf /etc/nginx/nginx.conf
-
-                    # 10. Nginx 컨테이너 시작
-                    CMD ["nginx", "-g", "daemon off;"]
-
-                    # 11. 80 포트 노출 (Nginx 기본 포트)
-                    EXPOSE 80
-                    """
-                    // 생성된 Dockerfile을 현재 작업 디렉토리에 저장
-                    writeFile(file: 'Dockerfile', text: dockerfileContent)
+                    script {
+                        echo 'Vue 앱 빌드 중...'
+                        sh 'npm run build'  // 빌드 명령어 실행
+                    }
                 }
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                echo 'Docker 이미지 빌드 중...'
                 script {
-                    // Docker 빌드를 실행할 디렉토리 명시
-                    sh 'docker build -t $DOCKER_IMAGE .'
+                    echo 'Docker 이미지 빌드 중...'
+                    // Dockerfile을 이용해 이미지 빌드
+                    sh '''
+                    docker build -t ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} .
+                    '''
                 }
             }
         }
 
         stage('Push Docker Image') {
             steps {
-                echo 'Docker 이미지 푸시 중...'
                 script {
-                    // Docker Hub에 푸시하려면 아래 주석을 해제
-                    // sh "docker push $DOCKER_IMAGE"
+                    echo 'Docker 이미지 Docker Hub에 푸시 중...'
+                    // Docker Hub 또는 사설 레지스트리에 푸시
+                    sh '''
+                    docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
+                    docker push ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG}
+                    '''
                 }
             }
         }
 
-        stage('Deploy to Remote Server') {
+        stage('Deploy to Server') {
             steps {
-                echo '원격 서버에 배포 중...'
                 script {
-                    // 원격 서버로 Docker 이미지를 배포하고 실행
-                    sh """
-                        ssh ${REMOTE_USER}@${REMOTE_HOST} 'docker pull ${DOCKER_IMAGE}'
-                        ssh ${REMOTE_USER}@${REMOTE_HOST} 'docker run -d -p 80:80 --name vue-app ${DOCKER_IMAGE}'
-                    """
+                    echo '서버에서 Docker 컨테이너 실행 중...'
+                    // 서버에서 Docker 컨테이너 실행
+                    sh '''
+                    ssh testdev@${SERVER_IP} "
+                        docker pull ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} &&
+                        docker stop \$(docker ps -q --filter name=${IMAGE_NAME}) &&
+                        docker rm \$(docker ps -aq --filter name=${IMAGE_NAME}) &&
+                        docker run -d --name ${IMAGE_NAME} -p 80:80 ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG}
+                    "
+                    '''
+                }
+            }
+        }
+
+        stage('Verify Application') {
+            steps {
+                script {
+                    echo '애플리케이션 상태 확인 중...'
+                    // pm2 상태 확인 또는 Docker 컨테이너 상태 확인
+                    sh 'ssh testdev@${SERVER_IP} "docker ps -a"'
                 }
             }
         }
     }
 
     post {
-        always {
-            // 작업 후 워크스페이스 정리
-            cleanWs()
+        success {
+            echo "배포가 성공적으로 완료되었습니다."
+        }
+        failure {
+            echo "배포에 실패했습니다."
+            // 실패 시 알림 추가 (예: 이메일, Slack 등)
         }
     }
 }

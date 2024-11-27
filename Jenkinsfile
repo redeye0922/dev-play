@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        SSH_KEY = credentials('testdev-ssh-key')  // Jenkins 자격 증명에서 SSH 키 ID
+        SSH_KEY = credentials("testdev-ssh-key")  // Jenkins 자격 증명에서 SSH 키 ID
         DEPLOY_DIR = "/home/testdev/devspace"
         SERVER_IP = "172.29.231.196"
         IMAGE_NAME = "my-vue-app"

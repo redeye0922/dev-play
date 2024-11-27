@@ -176,7 +176,7 @@ pipeline {
                         docker rm \$(docker ps -aq --filter name=${IMAGE_NAME}) &&
                         
                          # 새로운 컨테이너 실행 (3000 포트 매핑)
-                        docker run -d --name ${IMAGE_NAME} -p 3000:3000 ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG}
+                        docker run -it --name ${IMAGE_NAME} -p 3000:3000 ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG}
                         
                         # /app 디렉토리 확인
                         docker exec ${IMAGE_NAME} ls -l /app                        

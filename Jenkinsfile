@@ -142,7 +142,7 @@ pipeline {
                     sh '''                   
                     # Docker 빌드 실행
                     docker buildx create --use
-                    docker buildx --no-cache --build-arg BUILDKIT_INLINE_CACHE=1 --timeout=1200 -t ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} .                    
+                    docker buildx build --build-arg BUILDKIT_INLINE_CACHE=1 --timeout=1200 -t ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} .                    
                     '''
                 }
             }

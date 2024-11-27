@@ -137,12 +137,10 @@ pipeline {
             steps {
                 script {
                     echo 'Docker 이미지 빌드 중...'
-                    // Docker 이미지를 빌드할 때 --no-cache 옵션을 사용하여 캐시문제 배제  
                     // timeout:1200 : 20분으로 세팅
                     sh '''                   
                     # Docker 빌드 실행
-                    docker buildx create --use
-                    docker buildx build --build-arg BUILDKIT_INLINE_CACHE=1 --timeout=1200 -t ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} .                    
+                    docker build --timeout 1200 -t ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} .                    
                     '''
                 }
             }

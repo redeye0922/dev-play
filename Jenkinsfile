@@ -12,9 +12,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 echo 'GitHub에서 코드 체크아웃 중...'
-                //git 'https://github.com/redeye0922/dev-play.git'  // 공개 리포지토리, 인증 필요 없음
-                // SCM에서 최신 소스 코드 가져오기 (GitHub Webhook을 통해 트리거됨)
-                checkout scm
+                checkout scm  // GitHub 리포지토리에서 코드 체크아웃
             }
         }
 
@@ -28,10 +26,8 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 dir('vue-play') {
-                    script {
-                        echo 'npm 의존성 설치 중...'
-                        sh 'npm install'  // 의존성 설치
-                    }
+                    echo 'npm 의존성 설치 중...'
+                    sh 'npm install'  // 의존성 설치
                 }
             }
         }
@@ -39,18 +35,16 @@ pipeline {
         stage('Build Vue App') {
             steps {
                 dir('vue-play') {
-                    script {
-                        echo 'Vue 앱 빌드 중...'
-                        sh 'npm run build'  // 빌드 명령어 실행
-                    }
+                    echo 'Vue 앱 빌드 중...'
+                    sh 'npm run build'  // 빌드 명령어 실행
                 }
             }
         }
 
         stage('Generate Dockerfile') {
             steps {
+                echo 'Dockerfile 생성중...'
                 script {
-                    echo 'Dockerfile 생성중...'
                     // Dockerfile을 동적으로 생성
                     def dockerfileContent = """
                     # 1. Node.js 기반 이미지를 사용하여 Vue.js 빌드
@@ -94,29 +88,32 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
+                echo 'Docker 이미지 빌드 중...'
                 script {
                     // Docker 이미지를 빌드
-                    sh 'docker build -t $DOCKER_IMAGE .'
+                    sh "docker build -t ${DOCKER_IMAGE} ."  // 환경 변수를 사용하여 Docker 빌드
                 }
             }
         }
 
         stage('Push Docker Image') {
             steps {
+                echo 'Docker 이미지 푸시 중...'
                 script {
                     // Docker Hub에 푸시하려면 아래 주석을 해제
-                    // sh 'docker push $DOCKER_IMAGE'
+                    // sh "docker push ${DOCKER_IMAGE}"
                 }
             }
         }
 
         stage('Deploy to Remote Server') {
             steps {
+                echo '원격 서버에 배포 중...'
                 script {
                     // 원격 서버로 Docker 이미지를 배포하고 실행
                     sh """
-                        ssh $REMOTE_USER@$REMOTE_HOST 'docker pull $DOCKER_IMAGE'
-                        ssh $REMOTE_USER@$REMOTE_HOST 'docker run -d -p 80:80 --name vue-app $DOCKER_IMAGE'
+                        ssh ${REMOTE_USER}@${REMOTE_HOST} 'docker pull ${DOCKER_IMAGE}'
+                        ssh ${REMOTE_USER}@${REMOTE_HOST} 'docker run -d -p 80:80 --name vue-app ${DOCKER_IMAGE}'
                     """
                 }
             }

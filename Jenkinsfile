@@ -89,6 +89,9 @@ pipeline {
                     # 5. vue-play 폴더의 소스 코드 복사
                     COPY . .  
 
+                    # /app 디렉토리의 파일 목록 확인
+                    RUN echo "Contents of /app directory:" && ls -l /app
+                    
                     # 6. vue-play 디렉토리로 이동
                     WORKDIR /app/vue-play
                     
@@ -171,6 +174,9 @@ pipeline {
                         
                          # 새로운 컨테이너 실행 (3000 포트 매핑)
                         docker run -d --name ${IMAGE_NAME} -p 3000:3000 ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG}
+                        
+                        # /app 디렉토리 확인
+                        docker exec ${IMAGE_NAME} ls -l /app                        
                     "
                     '''
                 }

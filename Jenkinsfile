@@ -53,6 +53,51 @@ pipeline {
             }
         }
 
+        stage('Generate Dockerfile') {
+            steps {
+                echo 'Dockerfile 생성중...'
+                script {
+                    // Dockerfile을 동적으로 생성
+                    def dockerfileContent = """
+                    # 1. Node.js 기반 이미지를 사용하여 Vue.js 빌드
+                    FROM node:18 AS build-stage
+
+                    # 2. 작업 디렉토리 설정
+                    WORKDIR /app
+
+                    # 3. Vue 프로젝트의 종속성 파일 복사
+                    COPY package*.json ./
+
+                    # 4. 종속성 설치
+                    RUN npm install
+
+                    # 5. 프로젝트 소스 복사
+                    COPY . .
+
+                    # 6. Vue.js 프로젝트 빌드
+                    RUN npm run build
+
+                    # 7. Nginx를 이용한 정적 파일 서빙
+                    FROM nginx:alpine AS production-stage
+
+                    # 8. 빌드된 파일을 Nginx의 HTML 폴더에 복사
+                    COPY --from=build-stage /app/dist /usr/share/nginx/html
+
+                    # 9. Nginx 설정을 기본 설정으로 사용
+                    COPY ./nginx.conf /etc/nginx/nginx.conf
+
+                    # 10. Nginx 컨테이너 시작
+                    CMD ["nginx", "-g", "daemon off;"]
+
+                    # 11. 80 포트 노출 (Nginx 기본 포트)
+                    EXPOSE 80
+                    """
+                    // Jenkins 워크스페이스에 Dockerfile 생성
+                    writeFile(file: 'Dockerfile', text: dockerfileContent)
+                }
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 script {

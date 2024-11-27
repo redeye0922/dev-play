@@ -104,9 +104,6 @@ pipeline {
                     # http-server를 전역으로 설치
                     RUN npm install http-server --save-dev
 
-                    # 연결이 잘 안되는 경우가 있어서 10초 지연 시킴
-                    RUN sleep 5
-                    
                     # 8. Serve 패키지를 사용하여 정적 파일 서빙
                     FROM node:18-slim AS production-stage
                     

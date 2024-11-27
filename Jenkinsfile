@@ -2,6 +2,7 @@ pipeline {
     agent any
 
     environment {
+        SSH_KEY = credentials('testdev-ssh-key')  // Jenkins 자격 증명에서 SSH 키 ID
         DEPLOY_DIR = "/home/testdev/devspace"
         SERVER_IP = "172.29.231.196"
         IMAGE_NAME = "my-vue-app"
@@ -163,22 +164,24 @@ pipeline {
                 script {
                     echo '서버에서 Docker 컨테이너 실행 중...'
                     // 서버에서 Docker 컨테이너 실행
-                    sh '''
-                    ssh -o StrictHostKeyChecking=no testdev@${SERVER_IP} "
-                        # 최신 이미지를 서버에 풀어옴
-                        docker pull ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} &&
-                        
-                        # 이전 컨테이너가 있다면 중지하고 삭제
-                        docker stop \$(docker ps -q --filter name=${IMAGE_NAME}) &&
-                        docker rm \$(docker ps -aq --filter name=${IMAGE_NAME}) &&
-                        
-                         # 새로운 컨테이너 실행 (3000 포트 매핑)
-                        docker run -it --name ${IMAGE_NAME} -p 3000:3000 ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG}
-                        
-                        # /app 디렉토리 확인
-                        docker exec ${IMAGE_NAME} ls -l /app                        
-                    "
-                    '''
+                    sshagent([SSH_KEY]) {
+                        sh '''
+                        ssh -o StrictHostKeyChecking=no testdev@${SERVER_IP} <<EOF
+                            # 최신 이미지를 서버에 풀어옴
+                            docker pull ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} &&
+                            
+                            # 이전 컨테이너가 있다면 중지하고 삭제
+                            docker stop \$(docker ps -q --filter name=${IMAGE_NAME}) &&
+                            docker rm \$(docker ps -aq --filter name=${IMAGE_NAME}) &&
+                            
+                             # 새로운 컨테이너 실행 (3000 포트 매핑)
+                            docker run -it --name ${IMAGE_NAME} -p 3000:3000 ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG}
+                            
+                            # /app 디렉토리 확인
+                            docker exec ${IMAGE_NAME} ls -l /app                        
+                        EOF
+                        '''
+                    }                    
                 }
             }
         }

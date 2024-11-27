@@ -1,8 +1,6 @@
 pipeline {
     agent any
-    options {
-        timeout(time: 1, unit: 'HOURS')  // 빌드 타임아웃을 1시간으로 설정
-    }
+    
     environment {
         SSH_KEY = credentials("testdev-ssh-key")  // Jenkins 자격 증명에서 SSH 키 ID
         DEPLOY_DIR = "/home/testdev/devspace"

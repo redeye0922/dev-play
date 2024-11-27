@@ -97,18 +97,21 @@ pipeline {
                     
                     # 7. Vue.js 프로젝트 빌드
                     RUN npm run build
+
+                    # http-server를 전역으로 설치
+                    RUN npm install -g http-server
                     
                     # 8. Serve 패키지를 사용하여 정적 파일 서빙
                     FROM node:18-slim AS production-stage
                     
                     # 9. serve 패키지 설치
-                    RUN npm install -g serve
+                    RUN npm install -g http-server
                     
                     # 10. 빌드된 파일을 production-stage로 복사
                     COPY --from=build-stage /app/vue-play/dist /app
                     
                     # 11. serve로 정적 파일 서빙
-                    CMD ["http-server", "dist", "-p", "3000", "-a", "0.0.0.0"]
+                    CMD ["http-server", "/app", "-p", "3000", "-a", "0.0.0.0"]
                     
                     # 12. 3000 포트 노출
                     EXPOSE 3000

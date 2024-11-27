@@ -118,12 +118,11 @@ pipeline {
                 script {
                     echo 'Docker 이미지 빌드 중...'
                     // Docker 이미지를 빌드할 때 --cache-from 옵션을 사용하여 캐시된 이미지를 활용
-                    sh '''
-                    # Docker Hub에서 캐시된 이미지를 가져옵니다. (기존에 푸시된 이미지 사용)
-                    docker pull ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} || true
-
+                    //# Docker Hub에서 캐시된 이미지를 가져옵니다. (기존에 푸시된 이미지 사용)
+                    //docker pull ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} || true
+                    sh '''                   
                     # 캐시를 활용한 Docker 빌드
-                    docker build --cache-from ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} -t ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} .
+                    docker build -t ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} .                    
                     '''
                 }
             }

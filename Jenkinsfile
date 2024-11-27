@@ -99,7 +99,7 @@ pipeline {
                     RUN npm run build
 
                     # http-server를 전역으로 설치
-                    RUN npm install -g http-server
+                    RUN npm install http-server --save-dev
                     
                     # 8. Serve 패키지를 사용하여 정적 파일 서빙
                     FROM node:18-slim AS production-stage
@@ -111,7 +111,7 @@ pipeline {
                     COPY --from=build-stage /app/vue-play/dist /app
                     
                     # 11. serve로 정적 파일 서빙
-                    CMD ["http-server", "/app", "-p", "3000", "-a", "0.0.0.0"]
+                    CMD ["npx", "http-server", "/app", "-p", "3000", "-a", "0.0.0.0"]
                     
                     # 12. 3000 포트 노출
                     EXPOSE 3000

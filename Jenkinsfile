@@ -88,23 +88,26 @@ pipeline {
                     
                     # 5. vue-play 폴더의 소스 코드 복사
                     COPY . .  
+
+                    # 6. vue-play 디렉토리로 이동
+                    cd vue-play
                     
-                    # 6. Vue.js 프로젝트 빌드
+                    # 7. Vue.js 프로젝트 빌드
                     RUN npm run build
                     
-                    # 7. Serve 패키지를 사용하여 정적 파일 서빙
+                    # 8. Serve 패키지를 사용하여 정적 파일 서빙
                     FROM node:18-slim AS production-stage
                     
-                    # 8. serve 패키지 설치
+                    # 9. serve 패키지 설치
                     RUN npm install -g serve
                     
-                    # 9. 빌드된 파일을 production-stage로 복사
+                    # 10. 빌드된 파일을 production-stage로 복사
                     COPY --from=build-stage /app/dist /app
                     
-                    # 10. serve로 정적 파일 서빙
+                    # 11. serve로 정적 파일 서빙
                     CMD ["serve", "-s", ".", "-l", "3000"]
                     
-                    # 11. 3000 포트 노출
+                    # 12. 3000 포트 노출
                     EXPOSE 3000
                     """
                     // Jenkins 워크스페이스에 Dockerfile 생성

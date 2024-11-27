@@ -161,7 +161,7 @@ pipeline {
                     echo '서버에서 Docker 컨테이너 실행 중...'
                     // 서버에서 Docker 컨테이너 실행
                     sh '''
-                    ssh testdev@${SERVER_IP} "
+                    ssh -o StrictHostKeyChecking=no testdev@${SERVER_IP} "
                         # 최신 이미지를 서버에 풀어옴
                         docker pull ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} &&
                         

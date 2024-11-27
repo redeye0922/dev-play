@@ -90,7 +90,7 @@ pipeline {
                     COPY . .  
 
                     # 6. vue-play 디렉토리로 이동
-                    cd vue-play
+                    WORKDIR /app/vue-play
                     
                     # 7. Vue.js 프로젝트 빌드
                     RUN npm run build

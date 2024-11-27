@@ -7,8 +7,8 @@ pipeline {
         IMAGE_NAME = "my-vue-app"
         DOCKER_REGISTRY = "redeye0922"  // Docker Hub 또는 사설 레지스트리
         DOCKER_IMAGE_TAG = "${GIT_COMMIT}"
-        DOCKER_USERNAME="redeye0922"
-        DOCKER_PASSWORD="**jh7425**"
+        DOCKER_USERNAME = "redeye0922"
+        DOCKER_PASSWORD = "**jh7425**"
     }
 
     triggers {
@@ -102,9 +102,13 @@ pipeline {
             steps {
                 script {
                     echo 'Docker 이미지 빌드 중...'
-                    // Dockerfile을 이용해 이미지 빌드
+                    // Docker 이미지를 빌드할 때 --cache-from 옵션을 사용하여 캐시된 이미지를 활용
                     sh '''
-                    docker build -t ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} .
+                    # Docker Hub에서 캐시된 이미지를 가져옵니다. (기존에 푸시된 이미지 사용)
+                    docker pull ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} || true
+
+                    # 캐시를 활용한 Docker 빌드
+                    docker build --cache-from ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} -t ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} .
                     '''
                 }
             }
@@ -116,7 +120,10 @@ pipeline {
                     echo 'Docker 이미지 Docker Hub에 푸시 중...'
                     // Docker Hub 또는 사설 레지스트리에 푸시
                     sh '''
+                    # Docker Hub 로그인
                     docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
+                    
+                    # Docker 이미지를 푸시
                     docker push ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG}
                     '''
                 }
@@ -130,9 +137,14 @@ pipeline {
                     // 서버에서 Docker 컨테이너 실행
                     sh '''
                     ssh testdev@${SERVER_IP} "
+                        # 최신 이미지를 서버에 풀어옴
                         docker pull ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} &&
+                        
+                        # 이전 컨테이너가 있다면 중지하고 삭제
                         docker stop \$(docker ps -q --filter name=${IMAGE_NAME}) &&
                         docker rm \$(docker ps -aq --filter name=${IMAGE_NAME}) &&
+                        
+                        # 새로운 컨테이너 실행
                         docker run -d --name ${IMAGE_NAME} -p 80:80 ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG}
                     "
                     '''

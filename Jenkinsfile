@@ -137,10 +137,9 @@ pipeline {
             steps {
                 script {
                     echo 'Docker 이미지 빌드 중...'
-                    // timeout:1200 : 20분으로 세팅
                     sh '''                   
                     # Docker 빌드 실행
-                    docker build --timeout 1200 -t ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} .                    
+                    docker build -t ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} .                    
                     '''
                 }
             }

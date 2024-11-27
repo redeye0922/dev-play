@@ -60,6 +60,13 @@ pipeline {
                 }
             }
         }
+
+        stage('Verify vue-play directory') {
+            steps {
+                echo '디렉토리 확인 중...'
+                sh 'ls -l vue-play'  // vue-play 디렉토리가 존재하는지 확인
+            }
+        }
         
         stage('Generate Dockerfile') {
             steps {

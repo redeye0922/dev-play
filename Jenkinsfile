@@ -81,13 +81,13 @@ pipeline {
                     WORKDIR /app
 
                     # 3. Vue 프로젝트의 종속성 파일 복사
-                    COPY vue-play/package*.json ./  # vue-play 폴더 내의 package.json을 복사
+                    COPY ./vue-play/package*.json ./  # vue-play 폴더 내의 package.json을 복사
                     
                     # 4. 종속성 설치
                     RUN npm install
                     
                     # 5. 프로젝트 소스 복사
-                    COPY vue-play/ .  # vue-play 폴더의 모든 소스 코드 복사
+                    COPY ./vue-play/ .  # vue-play 폴더의 모든 소스 코드 복사
 
                     # 6. Vue.js 프로젝트 빌드
                     RUN npm run build

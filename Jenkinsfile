@@ -108,7 +108,7 @@ pipeline {
                     COPY --from=build-stage /app/vue-play/dist /app
                     
                     # 11. serve로 정적 파일 서빙
-                    CMD ["serve", "-s", "dist", "--listen", "0.0.0.0:3000"]
+                    CMD ["http-serve", "dist", "-p", "3000", "-a", "0.0.0.0"]
                     
                     # 12. 3000 포트 노출
                     EXPOSE 3000

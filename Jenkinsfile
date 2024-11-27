@@ -3,23 +3,23 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = 'redeye0922/my-vue-app'
-        REMOTE_HOST = '172.29.231.196'          // WSL에서 실행 중인 Ubuntu 서버 IP
-        REMOTE_USER = 'testdev'                 // 원격 서버 사용자명
-        REMOTE_PATH = '/home/testdev/devspace'  // 배포할 경로
+        REMOTE_HOST = '172.29.231.196'
+        REMOTE_USER = 'testdev'
+        REMOTE_PATH = '/home/testdev/devspace'
     }
 
     stages {
         stage('Checkout') {
             steps {
                 echo 'GitHub에서 코드 체크아웃 중...'
-                checkout scm  // GitHub 리포지토리에서 코드 체크아웃
+                checkout scm
             }
         }
 
         stage('Remove swagger-play') {
             steps {
-                echo '불필요한 swagger-play 폴더 삭제 중...'
-                sh 'rm -rf swagger-play'  // 불필요한 디렉토리 삭제
+                echo 'swagger-play 디렉토리 삭제 중...'
+                sh 'rm -rf swagger-play'
             }
         }
 
@@ -27,7 +27,7 @@ pipeline {
             steps {
                 dir('vue-play') {
                     echo 'npm 의존성 설치 중...'
-                    sh 'npm install'  // 의존성 설치
+                    sh 'npm install'
                 }
             }
         }
@@ -36,16 +36,15 @@ pipeline {
             steps {
                 dir('vue-play') {
                     echo 'Vue 앱 빌드 중...'
-                    sh 'npm run build'  // 빌드 명령어 실행
+                    sh 'npm run build'
                 }
             }
         }
 
         stage('Generate Dockerfile') {
             steps {
-                echo 'Dockerfile 생성중...'
+                echo 'Dockerfile 생성 중...'
                 script {
-                    // Dockerfile을 동적으로 생성
                     def dockerfileContent = """
                     # 1. Node.js 기반 이미지를 사용하여 Vue.js 빌드
                     FROM node:18 AS build-stage
@@ -80,7 +79,7 @@ pipeline {
                     # 11. 80 포트 노출 (Nginx 기본 포트)
                     EXPOSE 80
                     """
-                    // Jenkins 워크스페이스에 Dockerfile 생성
+                    // 생성된 Dockerfile을 현재 작업 디렉토리에 저장
                     writeFile(file: 'Dockerfile', text: dockerfileContent)
                 }
             }
@@ -90,7 +89,7 @@ pipeline {
             steps {
                 echo 'Docker 이미지 빌드 중...'
                 script {
-                    // Dockerfile 경로를 명시적으로 지정하여 빌드를 실행
+                    // Docker 빌드를 실행할 디렉토리 명시
                     sh 'docker build -t $DOCKER_IMAGE .'
                 }
             }

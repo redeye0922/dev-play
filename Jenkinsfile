@@ -53,6 +53,14 @@ pipeline {
             }
         }
 
+        stage('Check Workspace') {
+            steps {
+                script {
+                    echo "Current working directory: ${pwd()}"
+                }
+            }
+        }
+        
         stage('Generate Dockerfile') {
             steps {
                 echo 'Dockerfile 생성중...'

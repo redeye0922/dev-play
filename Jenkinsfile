@@ -78,7 +78,7 @@ pipeline {
                     FROM node:18 AS build-stage
                     
                     # 2. 작업 디렉토리 설정
-                    WORKDIR /app
+                    WORKDIR /vue-play
                     
                     # 3. vue-play 디렉토리 내의 package.json을 복사
                     COPY vue-play/package*.json ./  # vue-play 폴더 내의 package.json을 복사

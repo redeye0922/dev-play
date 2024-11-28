@@ -8,7 +8,7 @@ pipeline {
         DOCKER_REGISTRY = "redeye0922"  // Docker Hub 또는 사설 레지스트리
         DOCKER_IMAGE_TAG = "${GIT_COMMIT}"
         DOCKER_USERNAME = "redeye0922"
-        DOCKER_PASSWORD = "**jh7425**"  // 비밀번호는 Jenkins의 'Secret Text'로 관리
+        DOCKER_PASSWORD = "**jh7425**"
         //DOCKER_PASSWORD = credentials('DOCKER_PASSWORD')  // 비밀번호는 Jenkins의 'Secret Text'로 관리
     }
 
@@ -118,6 +118,7 @@ pipeline {
                 script {
                     echo '서버에서 Docker 컨테이너 실행 중...'
                     sh '''
+                        echo "이미지 이름: ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
                         ssh -i ~/.ssh/id_rsa testdev@${SERVER_IP} <<'EOF'
                             # 최신 이미지를 서버에 풀어옴
                             docker pull ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} &&

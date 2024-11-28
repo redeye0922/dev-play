@@ -129,7 +129,7 @@ pipeline {
                     // SSH 명령 실행
                     try {
                         sh """
-                            ssh -i /home/jenkins/.ssh/id_rsa testdev@${SERVER_IP} 'sh -s' <<EOF
+                            ssh -i /home/jenkins/.ssh/id_rsa testdev@${SERVER_IP} 'sh -s' << END
                                 # 실행 중인 my-vue-app- 컨테이너 모두 중지하고 삭제
                                 CONTAINER_IDS=\$(docker ps -q --filter "name=my-vue-app-")
                                 if [ -n "\$CONTAINER_IDS" ]; then
@@ -145,20 +145,20 @@ pipeline {
                                 # /app 디렉토리 확인
                                 echo "Checking /app directory..."
                                 docker exec ${IMAGE_NAME}-${BUILD_NUMBER} ls -l /app || { echo "/app 디렉토리가 없습니다."; exit 1; }
-                            EOF
+                            END
                         """
                     } catch (Exception e) {
                         // 배포 실패 시에도 실행 중인 컨테이너를 중지하고 삭제
                         echo "배포가 실패했습니다. 실행 중인 'my-vue-app-' 컨테이너를 중지하고 삭제합니다."
                         sh """
-                            ssh -i /home/jenkins/.ssh/id_rsa testdev@${SERVER_IP} 'sh -s' <<EOF
+                            ssh -i /home/jenkins/.ssh/id_rsa testdev@${SERVER_IP} 'sh -s' << END
                                 CONTAINER_IDS=\$(docker ps -q --filter "name=my-vue-app-")
                                 if [ -n "\$CONTAINER_IDS" ]; then
                                     echo "Stopping and removing existing 'my-vue-app-' containers..."
                                     docker stop \$CONTAINER_IDS
                                     docker rm -f \$CONTAINER_IDS
                                 fi
-                            EOF
+                            END
                         """
                         // 배포 실패 후 오류 발생
                         throw e
@@ -166,7 +166,6 @@ pipeline {
                 }
             }
         }
-
         
         stage('Verify Application') {
             steps {

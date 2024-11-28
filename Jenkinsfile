@@ -120,7 +120,7 @@ pipeline {
                         # 이미지 이름과 태그 확인
                         echo "이미지 이름: ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
 
-                        ssh -i ~/.ssh/id_rsa testdev@${SERVER_IP} <<'EOF'
+                        ssh -T -i ~/.ssh/id_rsa testdev@${SERVER_IP} <<'EOF'
                             # 최신 이미지를 서버에 풀어옴
                             docker pull ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} ||
                             { echo "이미지 풀기 실패!"; exit 1; }

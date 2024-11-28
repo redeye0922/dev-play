@@ -76,7 +76,7 @@ pipeline {
                     // Dockerfile을 동적으로 생성
                     def dockerfileContent = """
                     # 1. Node.js 기반 이미지를 사용하여 Vue.js 빌드
-                    FROM node:18 AS build-stage
+                    FROM registry.docker-cn.com/library/node:18-slim AS build-stage
                     
                     # 2. 작업 디렉토리 설정
                     WORKDIR /app
@@ -103,8 +103,8 @@ pipeline {
                     RUN npm install http-server --save-dev
 
                     # 8. Serve 패키지를 사용하여 정적 파일 서빙
-                    FROM node:18-slim AS production-stage
-                    
+                    FROM registry.docker-cn.com/library/node:18-slim AS production-stage
+                                        
                     # 9. serve 패키지 설치
                     RUN npm install -g http-server
                     

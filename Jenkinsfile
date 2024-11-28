@@ -5,11 +5,8 @@ pipeline {
         DOCKER_REGISTRY = "redeye0922"
         DOCKER_PASSWORD = credentials('DOCKER_PASSWORD')
         IMAGE_NAME = "my-vue-app"
-        MAJOR = 1
-        MINOR = 0
-        PATCH = 0
-        DOCKER_IMAGE_TAG = "v${MAJOR}.${MINOR}.${PATCH}"  // 초기 태그 (v1.0.0)
         SERVER_IP = "172.29.231.196"
+        DOCKER_IMAGE_TAG = ""
     }
 
     triggers {
@@ -79,27 +76,25 @@ pipeline {
             }
         }
 
-        stage('Show Timestamp and Tag') {
-            steps {
-                echo "Build tag: ${DOCKER_IMAGE_TAG}"
-            }
-        }
-
-        stage('Increment Version') {
+        stage('Determine Docker Image Tag') {
             steps {
                 script {
-                    echo "버전 증가 중..."
-                    PATCH = PATCH.toInteger()
-                    MINOR = MINOR.toInteger()
-                    if (PATCH >= 9) {
-                        PATCH = 0
-                        MINOR += 1
+                    // Git에서 마지막 태그를 가져옵니다
+                    def lastTag = sh(script: "git describe --tags --abbrev=0", returnStdout: true).trim()
+                    echo "Last Git tag: ${lastTag}"
+
+                    // 첫 번째 빌드인지 확인하고, 첫 번째 빌드는 v1.0.0으로 태깅
+                    if (lastTag == "") {
+                        DOCKER_IMAGE_TAG = "v1.0.0"  // 첫 번째 빌드일 경우
                     } else {
-                        PATCH += 1
+                        // 마지막 태그에서 버전을 증가
+                        def versionParts = lastTag.split("\\.")
+                        def major = versionParts[0]
+                        def minor = versionParts[1]
+                        def patch = versionParts[2].toInteger() + 1  // 패치 버전 증가
+                        DOCKER_IMAGE_TAG = "${major}.${minor}.${patch}"
                     }
-                    // 새로 증가된 버전으로 업데이트
-                    DOCKER_IMAGE_TAG = "v${MAJOR}.${MINOR}.${PATCH}"
-                    echo "새 버전: ${DOCKER_IMAGE_TAG}"
+                    echo "Docker image tag: ${DOCKER_IMAGE_TAG}"
                 }
             }
         }
@@ -108,7 +103,6 @@ pipeline {
             steps {
                 script {
                     echo 'Docker 이미지 빌드 중...'
-                    // 버전 증가 후 새로운 태그 사용
                     sh "DOCKER_CONTENT_TRUST=0 docker build -t ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} ."
                 }
             }
@@ -118,7 +112,6 @@ pipeline {
             steps {
                 script {
                     echo 'Docker 이미지 Docker Hub에 푸시 중...'
-                    // 버전 증가 후 태그 사용
                     sh '''
                     echo "${DOCKER_PASSWORD}" | docker login -u ${DOCKER_REGISTRY} --password-stdin
                     docker push ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG}

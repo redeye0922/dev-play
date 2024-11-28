@@ -54,5 +54,5 @@ const router = new VueRouter({
 });
 
 //처음 시작을 /login으로 시작하게 처리
-router.replace("/login");
+router.replace("/calculator");
 export default router;

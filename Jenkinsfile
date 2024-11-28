@@ -47,10 +47,13 @@ pipeline {
             steps {
                 echo "Pushing Docker image to Docker Hub..."
                 script {
-                    sh """
-                    docker login -u redeye0922 --password-stdin
-                    docker push ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG}
-                    """
+                    // docker login을 위한 비밀번호 처리
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                        sh """
+                        echo \$DOCKER_PASSWORD | docker login -u \$DOCKER_USERNAME --password-stdin
+                        docker push ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG}
+                        """
+                    }
                 }
             }
         }

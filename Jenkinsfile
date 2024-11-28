@@ -78,4 +78,84 @@ pipeline {
 
                     FROM node:18-slim AS production-stage
                     
-                    RUN
+                    RUN npm install -g http-server
+                    
+                    COPY --from=build-stage /app/vue-play/dist /app
+                    
+                    CMD ["npx", "http-server", "/app", "-p", "3000", "-a", "0.0.0.0"]
+                    
+                    EXPOSE 3000
+                    """
+                    writeFile(file: 'Dockerfile', text: dockerfileContent)
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    echo 'Docker 이미지 빌드 중...'
+                    sh 'DOCKER_CONTENT_TRUST=0 docker build -t ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} .'  // Docker 빌드
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                script {
+                    echo 'Docker 이미지 Docker Hub에 푸시 중...'
+                    sh '''
+                    docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
+                    docker push ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG}
+                    '''
+                }
+            }
+        }
+
+        stage('Deploy to Server') {
+            steps {
+                script {
+                    echo '서버에서 Docker 컨테이너 실행 중...'
+                    sh '''
+                        ssh -i ~/.ssh/id_rsa testdev@${SERVER_IP} <<'EOF'
+                            docker pull ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} &&
+                
+                            CONTAINER_ID=\$(docker ps -q --filter name=${IMAGE_NAME})
+                            if [ -n "\$CONTAINER_ID" ]; then
+                                docker stop \$CONTAINER_ID &&
+                                docker rm -f \$CONTAINER_ID
+                            fi &&
+                
+                            STOPPED_CONTAINERS=\$(docker ps -aq --filter name=${IMAGE_NAME})
+                            if [ -n "\$STOPPED_CONTAINERS" ]; then
+                                docker rm -f \$STOPPED_CONTAINERS
+                            fi &&
+                
+                            docker run -d --name ${IMAGE_NAME} -p 3000:3000 ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} &&
+                
+                            docker exec ${IMAGE_NAME} ls -l /app || { echo "/app 디렉토리가 없습니다."; exit 1; }
+                        EOF
+                    '''
+                }
+            }
+        }
+
+        stage('Verify Application') {
+            steps {
+                script {
+                    echo '애플리케이션 상태 확인 중...'
+                    sh 'ssh testdev@${SERVER_IP} "curl -s http://localhost:3000 || exit 1"'
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "배포가 성공적으로 완료되었습니다."
+        }
+        failure {
+            echo "배포에 실패했습니다."
+        }
+    }
+}

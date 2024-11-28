@@ -121,6 +121,8 @@ pipeline {
                         echo "이미지 이름: ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
 
                         ssh -T -i ~/.ssh/id_rsa testdev@${SERVER_IP} <<'EOF'
+                            # 서버에서 Docker 이미지 풀기 전 잠시 대기
+                            sleep 5 # 5초 대기
                             # 최신 이미지를 서버에 풀어옴
                             docker pull ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} ||
                             { echo "이미지 풀기 실패!"; exit 1; }

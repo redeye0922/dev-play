@@ -160,7 +160,7 @@ pipeline {
             echo "배포가 성공적으로 완료되었습니다."
         }
         failure {
-            echo "배포에 실패했습니다."
+            echo "배포 실패!"
         }
     }
 }

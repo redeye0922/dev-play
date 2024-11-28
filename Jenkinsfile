@@ -98,7 +98,7 @@ pipeline {
                         PATCH += 1
                     }
                     // 새로 증가된 버전으로 업데이트
-                    DOCKER_IMAGE_TAG = "${MAJOR}.${MINOR}.${PATCH}"
+                    DOCKER_IMAGE_TAG = "v${MAJOR}.${MINOR}.${PATCH}"
                     echo "새 버전: ${DOCKER_IMAGE_TAG}"
                 }
             }

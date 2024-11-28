@@ -118,27 +118,37 @@ pipeline {
                     echo '서버에서 Docker 컨테이너 실행 중...'
                     sh '''
                         ssh -i ~/.ssh/id_rsa testdev@${SERVER_IP} <<'EOF'
+                            # 최신 이미지를 서버에 풀어옴
                             docker pull ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} &&
-                
+        
+                            # 실행 중인 컨테이너가 있으면 중지하고 강제로 삭제
                             CONTAINER_ID=\$(docker ps -q --filter name=${IMAGE_NAME})
                             if [ -n "\$CONTAINER_ID" ]; then
+                                echo "실행 중인 컨테이너가 있습니다. 중지하고 삭제합니다..."
                                 docker stop \$CONTAINER_ID &&
-                                docker rm -f \$CONTAINER_ID
+                                docker rm -f \$CONTAINER_ID  # 강제로 삭제
+                            else
+                                echo "실행 중인 컨테이너가 없습니다."
                             fi &&
-                
+        
+                            # 모든 정지된 컨테이너 삭제
                             STOPPED_CONTAINERS=\$(docker ps -aq --filter name=${IMAGE_NAME})
                             if [ -n "\$STOPPED_CONTAINERS" ]; then
+                                echo "정지된 컨테이너를 삭제합니다..."
                                 docker rm -f \$STOPPED_CONTAINERS
                             fi &&
-                
+        
+                            # 새로운 컨테이너 실행 (3000 포트 매핑)
                             docker run -d --name ${IMAGE_NAME} -p 3000:3000 ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} &&
-                
+        
+                            # /app 디렉토리 확인
                             docker exec ${IMAGE_NAME} ls -l /app || { echo "/app 디렉토리가 없습니다."; exit 1; }
                         EOF
                     '''
                 }
             }
         }
+
 
         stage('Verify Application') {
             steps {

@@ -130,22 +130,23 @@ pipeline {
             }
         }
 
-        stage('Deploy to Server') {
+       stage('Deploy to Server') {
             steps {
                 script {
                     echo '서버에서 Docker 컨테이너 실행 중...'
                     
-                    // SSH를 통해 서버에서 Docker 명령어 실행
+                    // 서버에서 Docker 컨테이너 실행
                     sh '''
                         ssh -i ~/.ssh/id_rsa testdev@${SERVER_IP} <<EOF
                             # 최신 이미지를 서버에 풀어옴
                             docker pull ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} &&
                 
-                            # 이전 컨테이너가 있다면 중지하고 강제로 삭제
+                            # 실행 중인 컨테이너가 있으면 중지하고 강제로 삭제
                             CONTAINER_ID=\$(docker ps -q --filter name=${IMAGE_NAME})
                             if [ -n "\$CONTAINER_ID" ]; then
+                                echo "실행 중인 컨테이너가 있습니다. 중지하고 삭제합니다..."
                                 docker stop \$CONTAINER_ID &&
-                                docker rm -f \$CONTAINER_ID # 강제로 컨테이너 삭제
+                                docker rm -f \$CONTAINER_ID  # 강제로 삭제
                             else
                                 echo "실행 중인 컨테이너가 없습니다."
                             fi &&
@@ -153,7 +154,8 @@ pipeline {
                             # 모든 정지된 컨테이너 삭제
                             STOPPED_CONTAINERS=\$(docker ps -aq --filter name=${IMAGE_NAME})
                             if [ -n "\$STOPPED_CONTAINERS" ]; then
-                                docker rm \$STOPPED_CONTAINERS
+                                echo "정지된 컨테이너를 삭제합니다..."
+                                docker rm -f \$STOPPED_CONTAINERS
                             fi &&
                 
                             # 새로운 컨테이너 실행 (3000 포트 매핑)
@@ -166,7 +168,7 @@ pipeline {
                 }
             }
         }
-
+        
         stage('Verify Application') {
             steps {
                 script {

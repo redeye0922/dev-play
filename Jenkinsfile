@@ -2,14 +2,19 @@ pipeline {
     agent any
 
     environment {
-        DEPLOY_DIR = "/home/testdev/devspace"
-        SERVER_IP = "172.29.231.196"
+        // Docker 관련 변수
         IMAGE_NAME = "my-vue-app"
         DOCKER_REGISTRY = "redeye0922"  // Docker Hub 또는 사설 레지스트리        
         DOCKER_USERNAME = "redeye0922"
         DOCKER_PASSWORD = credentials('DOCKER_PASSWORD')  // 비밀번호는 Jenkins의 'Secret Text'로 관리
-        BUILD_TIMESTAMP = "${new Date().format('yyyyMMddHHmmss')}"
-        DOCKER_IMAGE_TAG = "${BUILD_TIMESTAMP}-${BUILD_NUMBER}"
+        
+        // 버전 번호 (예: v1.0.0, v1.0.1)
+        MAJOR = 1
+        MINOR = 0
+        PATCH = 0
+
+        // Docker 이미지 태그
+        DOCKER_IMAGE_TAG = "${MAJOR}.${MINOR}.${PATCH}"
     }
 
     triggers {
@@ -94,11 +99,29 @@ pipeline {
 
         stage('Show Timestamp and Tag') {
             steps {
-                echo "Build timestamp: ${BUILD_TIMESTAMP}"
                 echo "Build tag: ${DOCKER_IMAGE_TAG}"
             }
         }
         
+        stage('Increment Version') {
+            steps {
+                script {
+                    echo "버전 증가 중..."
+                    // PATCH가 9 이상이면 MINOR를 증가시키고 PATCH를 0으로 리셋
+                    if (PATCH >= 9) {
+                        PATCH = 0
+                        MINOR += 1
+                    } else {
+                        PATCH += 1
+                    }
+
+                    // 새 버전 업데이트
+                    DOCKER_IMAGE_TAG = "${MAJOR}.${MINOR}.${PATCH}"
+                    echo "새 버전: ${DOCKER_IMAGE_TAG}"
+                }
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 script {

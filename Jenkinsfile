@@ -181,14 +181,14 @@ pipeline {
                 script {
                     echo "이미지 이름: ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
                     sh '''
-                        # 서버에서 Docker 컨테이너 실행 중...
+                        // 서버에서 Docker 컨테이너 실행 중...
                         ssh -T -i ~/.ssh/id_rsa testdev@${SERVER_IP} <<EOF
-                            # 이미지 풀기
+                            // 이미지 풀기
                             echo "이미지 풀기: ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
                             docker pull ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} || \
                             { echo "이미지 풀기 실패!"; docker images; exit 1; }
 
-                            # 실행 중인 컨테이너가 있으면 중지하고 새로 실행
+                            // 실행 중인 컨테이너가 있으면 중지하고 새로 실행
                             CONTAINER_ID=\$(docker ps -q --filter name=${IMAGE_NAME})
                             if [ -n "\$CONTAINER_ID" ]; then
                                 echo "실행 중인 컨테이너가 있습니다. 기존 컨테이너를 중지하고 제거합니다..."
@@ -196,10 +196,10 @@ pipeline {
                                 docker rm \$CONTAINER_ID
                             fi
 
-                            # 새로운 컨테이너 실행 (3000 포트 매핑)
+                            // 새로운 컨테이너 실행 (3000 포트 매핑)
                             docker run -d --name ${IMAGE_NAME}-${BUILD_NUMBER} -p 3000:3000 ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG}
 
-                            # /app 디렉토리 확인
+                            // /app 디렉토리 확인
                             docker exec ${IMAGE_NAME}-${BUILD_NUMBER} ls -l /app || { echo "/app 디렉토리가 없습니다."; exit 1; }
                         EOF
                     '''

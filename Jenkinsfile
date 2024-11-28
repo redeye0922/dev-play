@@ -19,13 +19,15 @@ pipeline {
         stage('Determine Docker Image Tag') {
             steps {
                 script {
-                    // 최신 태그를 가져오거나 기본 버전 v1.0.0 설정
-                    def latestTag = sh(script: "git describe --tags --abbrev=0", returnStdout: true).trim()
-                    if (!latestTag) {
-                        latestTag = "v1.0.0"
+                    // git describe가 실패하면 v1.0.0을 기본으로 사용
+                    try {
+                        def latestTag = sh(script: "git describe --tags --abbrev=0", returnStdout: true).trim()
+                        echo "Git 태그: ${latestTag}"
+                        env.DOCKER_IMAGE_TAG = latestTag
+                    } catch (Exception e) {
+                        echo "태그가 없습니다. 기본 태그 v1.0.0을 사용합니다."
+                        env.DOCKER_IMAGE_TAG = "v1.0.0"
                     }
-                    echo "Build tag: ${latestTag}"
-                    env.DOCKER_IMAGE_TAG = latestTag
                 }
             }
         }

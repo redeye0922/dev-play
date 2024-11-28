@@ -9,6 +9,8 @@ pipeline {
         DOCKER_IMAGE_TAG = "${BUILD_TIMESTAMP}"
         DOCKER_USERNAME = "redeye0922"
         DOCKER_PASSWORD = credentials('DOCKER_PASSWORD')  // 비밀번호는 Jenkins의 'Secret Text'로 관리
+        BUILD_TIMESTAMP = "${new Date().format('yyyyMMddHHmmss')}"
+        BUILD_TAG = "${BUILD_TIMESTAMP}-${BUILD_NUMBER}"
     }
 
     triggers {
@@ -91,6 +93,13 @@ pipeline {
             }
         }
 
+        stage('Show Timestamp and Tag') {
+            steps {
+                echo "Build timestamp: ${BUILD_TIMESTAMP}"
+                echo "Build tag: ${BUILD_TAG}"
+            }
+        }
+        
         stage('Build Docker Image') {
             steps {
                 script {

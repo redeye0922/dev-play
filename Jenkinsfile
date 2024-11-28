@@ -109,6 +109,11 @@ pipeline {
             steps {
                 script {
                     echo "버전 증가 중..."
+                    
+                    // PATCH와 MINOR가 문자열로 되어 있다면 숫자로 변환
+                    PATCH = PATCH.toInteger()
+                    MINOR = MINOR.toInteger()
+                    
                     // PATCH가 9 이상이면 MINOR를 증가시키고 PATCH를 0으로 리셋
                     if (PATCH >= 9) {
                         PATCH = 0

@@ -134,10 +134,11 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
+                    //DOCKER_CONTENT_TRUST=0 이미지 서명 검증 비활성화 TLS 문제 우회처리
                     echo 'Docker 이미지 빌드 중...'
                     sh '''                   
                     # Docker 빌드 실행
-                    docker build -t ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} .                    
+                    DOCKER_CONTENT_TRUST=0 docker build -t ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} .                    
                     '''
                 }
             }

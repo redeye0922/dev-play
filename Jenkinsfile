@@ -6,11 +6,7 @@ pipeline {
         DOCKER_PASSWORD = credentials('DOCKER_PASSWORD')
         IMAGE_NAME = "my-vue-app"
         SERVER_IP = "172.29.231.196"
-        DOCKER_IMAGE_TAG = ""
-    }
-
-    triggers {
-        githubPush()
+        DOCKER_IMAGE_TAG = "v1.0.${BUILD_NUMBER}"
     }
 
     stages {
@@ -72,38 +68,6 @@ pipeline {
                     EXPOSE 3000
                     """
                     writeFile(file: 'Dockerfile', text: dockerfileContent)
-                }
-            }
-        }
-
-        stage('Determine Docker Image Tag') {
-            steps {
-                script {
-                    // Git에서 마지막 태그를 가져옵니다
-                    def lastTag = ""
-                    try {
-                        lastTag = sh(script: "git describe --tags --abbrev=0", returnStdout: true).trim()
-                    } catch (Exception e) {
-                        echo "No tags found. Starting from v1.0.0."
-                    }
-
-                    // 첫 번째 빌드일 경우 v1.0.0, 이후에는 패치 버전 증가
-                    if (lastTag == "") {
-                        DOCKER_IMAGE_TAG = "v1.0.0"
-                    } else {
-                        def versionParts = lastTag.split("\\.")
-                        def major = versionParts[0]
-                        def minor = versionParts[1]
-                        def patch = versionParts[2].toInteger() + 1  // 패치 버전 증가
-                        DOCKER_IMAGE_TAG = "${major}.${minor}.${patch}"
-                    }
-
-                    // 태그가 비어 있으면 빌드를 중지합니다.
-                    if (DOCKER_IMAGE_TAG == "") {
-                        error "DOCKER_IMAGE_TAG가 설정되지 않았습니다!"
-                    }
-
-                    echo "Docker image tag: ${DOCKER_IMAGE_TAG}"
                 }
             }
         }

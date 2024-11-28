@@ -131,11 +131,14 @@ pipeline {
                         // 기존 컨테이너 중지 및 삭제
                         sh """
                             ssh -i /home/jenkins/.ssh/id_rsa testdev@${SERVER_IP} "
+                                # 기존 실행 중인 my-vue-app- 컨테이너들 찾기
                                 CONTAINER_IDS=\$(docker ps -q --filter 'name=my-vue-app-')
                                 if [ -n \"\$CONTAINER_IDS\" ]; then
                                     echo 'Stopping and removing existing my-vue-app- containers...'
                                     docker stop \$CONTAINER_IDS
                                     docker rm -f \$CONTAINER_IDS
+                                else
+                                    echo 'No existing my-vue-app- containers to stop.'
                                 fi
                             "
                         """
@@ -165,6 +168,8 @@ pipeline {
                                     echo 'Stopping and removing existing my-vue-app- containers...'
                                     docker stop \$CONTAINER_IDS
                                     docker rm -f \$CONTAINER_IDS
+                                else
+                                    echo 'No existing my-vue-app- containers to stop.'
                                 fi
                             "
                         """
@@ -174,7 +179,6 @@ pipeline {
                 }
             }
         }
-
         
         stage('Verify Application') {
             steps {

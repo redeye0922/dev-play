@@ -2,10 +2,8 @@ pipeline {
     agent any
 
     environment {
-        // Docker 관련 변수
-        IMAGE_NAME = "my-vue-app"
+        // Docker 관련 변수 (DOCKER_REGISTRY만 사용)
         DOCKER_REGISTRY = "redeye0922"  // Docker Hub 또는 사설 레지스트리        
-        DOCKER_USERNAME = "redeye0922"
         DOCKER_PASSWORD = credentials('DOCKER_PASSWORD')  // 비밀번호는 Jenkins의 'Secret Text'로 관리
         
         // 버전 번호 (예: v1.0.0, v1.0.1)
@@ -15,6 +13,8 @@ pipeline {
 
         // Docker 이미지 태그
         DOCKER_IMAGE_TAG = "${MAJOR}.${MINOR}.${PATCH}"
+        
+        // 서버 IP
         SERVER_IP = "172.29.231.196"  // 실제 서버의 IP 주소를 입력하세요.
     }
 
@@ -137,7 +137,7 @@ pipeline {
                 script {
                     echo 'Docker 이미지 Docker Hub에 푸시 중...'
                     sh '''
-                    echo "${DOCKER_PASSWORD}" | docker login -u ${DOCKER_USERNAME} --password-stdin
+                    echo "${DOCKER_PASSWORD}" | docker login -u ${DOCKER_REGISTRY} --password-stdin
                     docker push ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG}
                     '''
                 }

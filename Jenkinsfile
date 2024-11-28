@@ -121,36 +121,37 @@ pipeline {
         }
 
         stage('Deploy to Server') {
-            steps {
-                script {
-                    echo '서버에서 Docker 컨테이너 실행 중...'
-                    def imageTag = "${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
-        
-                    // 태그 값 확인을 위한 디버깅 출력
-                    echo "Using Docker image: ${imageTag}"
-        
-                    // SSH 명령 실행
-                    sh """
-                        ssh -i /home/jenkins/.ssh/id_rsa testdev@${SERVER_IP} << 'EOF'
-                            echo "Pulling Docker image ${imageTag}..."
-                            docker pull ${imageTag} &&
-                            
-                            CONTAINER_ID=\$(docker ps -q --filter name=${IMAGE_NAME})
-                            if [ -n "\$CONTAINER_ID" ]; then
-                                docker stop \$CONTAINER_ID
-                                docker rm -f \$CONTAINER_ID
-                            fi &&
-                            
-                            echo "Running new container from image ${imageTag}..."
-                            docker run -d --name ${IMAGE_NAME}-${BUILD_NUMBER} -p 3000:3000 ${imageTag} &&
-                            
-                            echo "Checking /app directory..."
-                            docker exec ${IMAGE_NAME}-${BUILD_NUMBER} ls -l /app || { echo "/app 디렉토리가 없습니다."; exit 1; }
-                        EOF
-                    """
-                }
+        steps {
+            script {
+                echo '서버에서 Docker 컨테이너 실행 중...'
+                def imageTag = "${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
+    
+                // 태그 값 확인을 위한 디버깅 출력
+                echo "Using Docker image: ${imageTag}"
+    
+                // SSH 명령 실행
+                sh """
+                    ssh -i /home/jenkins/.ssh/id_rsa testdev@${SERVER_IP} << EOF
+                        echo "Pulling Docker image ${imageTag}..."
+                        docker pull ${imageTag} &&
+                        
+                        CONTAINER_ID=\$(docker ps -q --filter name=${IMAGE_NAME})
+                        if [ -n "\$CONTAINER_ID" ]; then
+                            docker stop \$CONTAINER_ID
+                            docker rm -f \$CONTAINER_ID
+                        fi &&
+                        
+                        echo "Running new container from image ${imageTag}..."
+                        docker run -d --name ${IMAGE_NAME}-${BUILD_NUMBER} -p 3000:3000 ${imageTag} &&
+                        
+                        echo "Checking /app directory..."
+                        docker exec ${IMAGE_NAME}-${BUILD_NUMBER} ls -l /app || { echo "/app 디렉토리가 없습니다."; exit 1; }
+                    EOF
+                """
             }
         }
+    }
+
 
 
         stage('Verify Application') {

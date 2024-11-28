@@ -141,7 +141,14 @@ pipeline {
                     }
 
                     // 빌드된 이미지 확인
+                    echo '빌드된 Docker 이미지:'
                     sh 'docker images'
+
+                    // 태그가 제대로 생성되었는지 확인
+                    def imageExist = sh(script: "docker images ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG}", returnStatus: true)
+                    if (imageExist != 0) {
+                        error "이미지가 존재하지 않습니다. 태그가 잘못되었거나 빌드가 실패한 것일 수 있습니다."
+                    }
                 }
             }
         }
@@ -150,17 +157,20 @@ pipeline {
             steps {
                 script {
                     echo 'Docker 이미지 Docker Hub에 푸시 중...'
+                    
+                    // Docker Hub에 로그인
                     sh '''
                     echo "${DOCKER_PASSWORD}" | docker login -u ${DOCKER_REGISTRY} --password-stdin
+                    '''
                     
-                    # 이미지가 존재하는지 확인
-                    if ! docker images ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG}; then
-                        echo "이미지가 존재하지 않습니다. 푸시를 종료합니다."
-                        exit 1
-                    fi
-                    
-                    # 이미지 푸시
-                    docker push ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG}
+                    // 이미지가 존재하는지 확인
+                    def imageExist = sh(script: "docker images ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG}", returnStatus: true)
+                    if (imageExist != 0) {
+                        error "이미지가 존재하지 않습니다. 푸시를 종료합니다."
+                    }
+
+                    // 이미지 푸시
+                    sh "docker push ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
                     '''
                 }
             }

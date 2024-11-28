@@ -19,8 +19,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 echo 'GitHub에서 코드 체크아웃 중...'
-                git 'https://github.com/redeye0922/dev-play.git'  // 공개 리포지토리, 인증 필요 없음
-                checkout scm
+                checkout scm  // scm에서 체크아웃
             }
         }
 
@@ -47,4 +46,36 @@ pipeline {
                 dir('vue-play') {
                     script {
                         echo 'Vue 앱 빌드 중...'
-  
+                        sh 'npm run build'  // 빌드 명령어 실행
+                    }
+                }
+            }
+        }
+
+        stage('Generate Dockerfile') {
+            steps {
+                echo 'Dockerfile 생성중...'
+                script {
+                    def dockerfileContent = """
+                    # 1. Node.js 기반 이미지를 사용하여 Vue.js 빌드
+                    FROM node:18-slim AS build-stage
+
+                    RUN mkdir -p /app
+
+                    WORKDIR /app
+                    
+                    COPY ./vue-play/package*.json .  
+                    
+                    RUN npm install
+                    
+                    COPY . .  
+
+                    RUN echo "Contents of /app directory:" && ls -l /app
+                    
+                    WORKDIR /app/vue-play
+                    
+                    RUN npm run build
+
+                    FROM node:18-slim AS production-stage
+                    
+                    RUN

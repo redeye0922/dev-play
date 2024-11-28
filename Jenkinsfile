@@ -172,7 +172,7 @@ pipeline {
                     
                     // 서버에서 Docker 컨테이너 실행
                     //sshagent([SSH_KEY]) {
-                        sh '''                        
+                        sh '''
                             ssh -i ~/.ssh/id_rsa testdev@${SERVER_IP} <<EOF
                                 # 최신 이미지를 서버에 풀어옴
                                 docker pull ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} &&
@@ -197,7 +197,7 @@ pipeline {
                         
                                 # /app 디렉토리 확인
                                 docker exec ${IMAGE_NAME} ls -l /app || echo "/app 디렉토리가 없습니다."
-                            EOF
+                        EOF
                         '''
                     //}                    
                 }

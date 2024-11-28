@@ -5,6 +5,7 @@ pipeline {
         // Docker 관련 변수 (DOCKER_REGISTRY만 사용)
         DOCKER_REGISTRY = "redeye0922"  // Docker Hub 또는 사설 레지스트리        
         DOCKER_PASSWORD = credentials('DOCKER_PASSWORD')  // 비밀번호는 Jenkins의 'Secret Text'로 관리
+        IMAGE_NAME = "my-vue-app"  // Docker 이미지 이름
         
         // 버전 번호 (예: v1.0.0, v1.0.1)
         MAJOR = 1
@@ -127,7 +128,8 @@ pipeline {
             steps {
                 script {
                     echo 'Docker 이미지 빌드 중...'
-                    sh 'DOCKER_CONTENT_TRUST=0 docker build -t ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} .'  // Docker 빌드
+                    // Docker 이미지를 빌드할 때 IMAGE_NAME 변수를 사용
+                    sh "DOCKER_CONTENT_TRUST=0 docker build -t ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} ."  // Docker 빌드
                 }
             }
         }

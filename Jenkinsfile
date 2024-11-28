@@ -9,6 +9,7 @@ pipeline {
         DOCKER_IMAGE_TAG = "${GIT_COMMIT}"
         DOCKER_USERNAME = "redeye0922"
         DOCKER_PASSWORD = "**jh7425**"  // 비밀번호는 Jenkins의 'Secret Text'로 관리
+        //DOCKER_PASSWORD = credentials('DOCKER_PASSWORD')  // 비밀번호는 Jenkins의 'Secret Text'로 관리
     }
 
     triggers {
@@ -54,7 +55,7 @@ pipeline {
 
         stage('Generate Dockerfile') {
             steps {
-                echo 'Dockerfile 생성중...'
+                echo 'Dockerfile 생성 중...'
                 script {
                     def dockerfileContent = """
                     # 1. Node.js 기반 이미지를 사용하여 Vue.js 빌드
@@ -139,10 +140,10 @@ pipeline {
                             fi &&
         
                             # 새로운 컨테이너 실행 (3000 포트 매핑)
-                            docker run -d --name ${IMAGE_NAME} -p 3000:3000 ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} &&
+                            docker run -d --name ${IMAGE_NAME}-${BUILD_NUMBER} -p 3000:3000 ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} &&
         
                             # /app 디렉토리 확인
-                            docker exec ${IMAGE_NAME} ls -l /app || { echo "/app 디렉토리가 없습니다."; exit 1; }
+                            docker exec ${IMAGE_NAME}-${BUILD_NUMBER} ls -l /app || { echo "/app 디렉토리가 없습니다."; exit 1; }
                         EOF
                     '''
                 }

@@ -158,6 +158,12 @@ pipeline {
                                 docker exec ${IMAGE_NAME}-${BUILD_NUMBER} ls -l /app || { echo "/app 디렉토리가 없습니다."; exit 1; }
                             '
                         """
+        
+                        // 애플리케이션 상태 확인
+                        echo '애플리케이션 상태 확인 중...'
+                        sh """
+                            ssh testdev@${SERVER_IP} 'sleep 10 && curl -s http://localhost:3001 || exit 1'
+                        """
                     } catch (Exception e) {
                         // 배포 실패 시에도 실행 중인 컨테이너를 중지하고 삭제
                         echo "배포가 실패했습니다. 실행 중인 'my-vue-app-' 컨테이너를 중지하고 삭제합니다."
@@ -179,7 +185,6 @@ pipeline {
                 }
             }
         }
-
         
         stage('Verify Application') {
             steps {

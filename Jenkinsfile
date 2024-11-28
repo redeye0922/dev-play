@@ -130,10 +130,7 @@ pipeline {
                     try {
                         sh """
                             ssh -i /home/jenkins/.ssh/id_rsa testdev@${SERVER_IP} 'bash -s' << EOF
-                                echo "Pulling Docker image ${imageTag}..."
-                                docker pull ${imageTag}
-        
-                                # 기존에 'my-vue-app-'으로 시작하는 컨테이너가 있으면 중지하고 삭제
+                                # 실행 중인 my-vue-app- 컨테이너 모두 중지하고 삭제
                                 CONTAINER_IDS=\$(docker ps -q --filter "name=my-vue-app-")
                                 if [ -n "\$CONTAINER_IDS" ]; then
                                     echo "Stopping and removing existing 'my-vue-app-' containers..."
@@ -142,7 +139,7 @@ pipeline {
                                 fi
         
                                 # 새 컨테이너 실행
-                                echo "Running new container from image ${imageTag} on port 3001..."
+                                echo "Running new container from image ${imageTag}..."
                                 docker run -d --name ${IMAGE_NAME}-${BUILD_NUMBER} -p 3001:3000 ${imageTag}
         
                                 # /app 디렉토리 확인
@@ -151,7 +148,7 @@ pipeline {
                             EOF
                         """
                     } catch (Exception e) {
-                        // 배포 실패 시 'my-vue-app-' 컨테이너 중지 및 제거
+                        // 배포 실패 시에도 실행 중인 컨테이너를 중지하고 삭제
                         echo "배포가 실패했습니다. 실행 중인 'my-vue-app-' 컨테이너를 중지하고 삭제합니다."
                         sh """
                             ssh -i /home/jenkins/.ssh/id_rsa testdev@${SERVER_IP} 'bash -s' << EOF
@@ -169,7 +166,6 @@ pipeline {
                 }
             }
         }
-
         
         stage('Verify Application') {
             steps {

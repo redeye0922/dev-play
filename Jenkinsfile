@@ -2,7 +2,9 @@ pipeline {
     agent any
     
     environment {
-        SSH_KEY = credentials('ssh-key-SSH_KEY')   // Jenkins 자격 증명에서 SSH 키 ID
+        //ssh key를 testdev-ssh-key로 입력했는데 ssh-key-SSH_KEY를 찾고있어서 오류발생 
+        //sshagent에서 아이디 바뀌어 들어가는것 같은데 확인 못해봐서 직접 입력하게 수정해야겠음
+        //SSH_KEY = credentials('ssh-key-SSH_KEY')   // Jenkins 자격 증명에서 SSH 키 ID
         DEPLOY_DIR = "/home/testdev/devspace"
         SERVER_IP = "172.29.231.196"
         IMAGE_NAME = "my-vue-app"
@@ -166,9 +168,9 @@ pipeline {
                     echo '서버에서 Docker 컨테이너 실행 중...'
                     
                     // 서버에서 Docker 컨테이너 실행
-                    sshagent([SSH_KEY]) {
+                    //sshagent([SSH_KEY]) {
                         sh '''
-                        ssh testdev@${SERVER_IP} <<EOF
+                        ssh -i ~/.ssh/authorized_keys testdev@${SERVER_IP} <<EOF
                             # 최신 이미지를 서버에 풀어옴
                             docker pull ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} &&
         
@@ -184,7 +186,7 @@ pipeline {
         
                         EOF
                         '''
-                    }                    
+                    //}                    
                 }
             }
         }

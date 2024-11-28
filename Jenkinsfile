@@ -134,7 +134,14 @@ pipeline {
                 script {
                     echo 'Docker 이미지 빌드 중...'
                     // Docker 이미지를 빌드할 때 IMAGE_NAME 변수를 사용
-                    sh "DOCKER_CONTENT_TRUST=0 docker build -t ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} ."  // Docker 빌드
+                    def buildStatus = sh(script: "DOCKER_CONTENT_TRUST=0 docker build -t ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} .", returnStatus: true)
+                    
+                    if (buildStatus != 0) {
+                        error "Docker 이미지 빌드 실패!"
+                    }
+
+                    // 빌드된 이미지 확인
+                    sh 'docker images'
                 }
             }
         }
@@ -145,6 +152,14 @@ pipeline {
                     echo 'Docker 이미지 Docker Hub에 푸시 중...'
                     sh '''
                     echo "${DOCKER_PASSWORD}" | docker login -u ${DOCKER_REGISTRY} --password-stdin
+                    
+                    # 이미지가 존재하는지 확인
+                    if ! docker images ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG}; then
+                        echo "이미지가 존재하지 않습니다. 푸시를 종료합니다."
+                        exit 1
+                    fi
+                    
+                    # 이미지 푸시
                     docker push ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG}
                     '''
                 }

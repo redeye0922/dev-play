@@ -2,93 +2,53 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_REGISTRY = "redeye0922"
-        DOCKER_PASSWORD = credentials('DOCKER_PASSWORD')
-        IMAGE_NAME = "my-vue-app"
-        SERVER_IP = "172.29.231.196"
-        DOCKER_IMAGE_TAG = "v1.0.${BUILD_NUMBER}"
+        DOCKER_REGISTRY = 'docker.io'
+        IMAGE_NAME = 'my-vue-app'
+        BUILD_NUMBER = "${env.BUILD_NUMBER}"
+        SERVER_IP = 'your.server.ip'  // 서버의 IP 주소
     }
 
     stages {
         stage('Checkout') {
             steps {
-                echo 'GitHub에서 코드 체크아웃 중...'
+                echo 'Checking out the repository...'
                 checkout scm
             }
         }
 
-        stage('Remove swagger-play') {
+        stage('Determine Docker Image Tag') {
             steps {
-                echo '불필요한 swagger-play 폴더 삭제 중...'
-                sh 'rm -rf swagger-play'
-            }
-        }
-
-        stage('Install Dependencies') {
-            steps {
-                dir('vue-play') {
-                    script {
-                        echo 'npm 의존성 설치 중...'
-                        sh 'npm install'
-                    }
-                }
-            }
-        }
-
-        stage('Build Vue App') {
-            steps {
-                dir('vue-play') {
-                    script {
-                        echo 'Vue 앱 빌드 중...'
-                        sh 'npm run build'
-                    }
-                }
-            }
-        }
-
-        stage('Generate Dockerfile') {
-            steps {
-                echo 'Dockerfile 생성 중...'
                 script {
-                    def dockerfileContent = """
-                    FROM node:18-slim AS build-stage
-                    RUN mkdir -p /app
-                    WORKDIR /app
-                    COPY ./vue-play/package*.json .
-                    RUN npm install
-                    COPY . .
-                    RUN echo "Contents of /app directory:" && ls -l /app
-                    WORKDIR /app/vue-play
-                    RUN npm run build
-
-                    FROM node:18-slim AS production-stage
-                    RUN npm install -g http-server
-                    COPY --from=build-stage /app/vue-play/dist /app
-                    CMD ["npx", "http-server", "/app", "-p", "3000", "-a", "0.0.0.0"]
-                    EXPOSE 3000
-                    """
-                    writeFile(file: 'Dockerfile', text: dockerfileContent)
+                    // 최신 태그를 가져오거나 기본 버전 v1.0.0 설정
+                    def latestTag = sh(script: "git describe --tags --abbrev=0", returnStdout: true).trim()
+                    if (!latestTag) {
+                        latestTag = "v1.0.0"
+                    }
+                    echo "Build tag: ${latestTag}"
+                    env.DOCKER_IMAGE_TAG = latestTag
                 }
             }
         }
 
         stage('Build Docker Image') {
             steps {
+                echo "Building Docker image with tag ${DOCKER_IMAGE_TAG}..."
                 script {
-                    echo 'Docker 이미지 빌드 중...'
-                    sh "DOCKER_CONTENT_TRUST=0 docker build -t ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} ."
+                    sh """
+                    docker build -t ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} .
+                    """
                 }
             }
         }
 
         stage('Push Docker Image') {
             steps {
+                echo "Pushing Docker image to Docker Hub..."
                 script {
-                    echo 'Docker 이미지 Docker Hub에 푸시 중...'
-                    sh '''
-                    echo "${DOCKER_PASSWORD}" | docker login -u ${DOCKER_REGISTRY} --password-stdin
+                    sh """
+                    docker login -u redeye0922 --password-stdin
                     docker push ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG}
-                    '''
+                    """
                 }
             }
         }
@@ -96,18 +56,24 @@ pipeline {
         stage('Deploy to Server') {
             steps {
                 script {
-                    echo "이미지 이름: ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
+                    echo "Deploying Docker image to server..."
                     sh '''
                     ssh -T -i ~/.ssh/id_rsa testdev@${SERVER_IP} <<EOF
                         echo "이미지 풀기: ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
                         docker pull ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} || { echo "이미지 풀기 실패!"; exit 1; }
+                        
                         CONTAINER_ID=\$(docker ps -q --filter name=${IMAGE_NAME})
+                        
                         if [ -n "\$CONTAINER_ID" ]; then
                             echo "실행 중인 컨테이너가 있습니다. 기존 컨테이너를 중지하고 제거합니다..."
                             docker stop \$CONTAINER_ID
                             docker rm \$CONTAINER_ID
                         fi
+                        
+                        echo "새로운 컨테이너 실행 중..."
                         docker run -d --name ${IMAGE_NAME}-${BUILD_NUMBER} -p 3000:3000 ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG}
+                        
+                        echo "컨테이너 디렉토리 확인:"
                         docker exec ${IMAGE_NAME}-${BUILD_NUMBER} ls -l /app || { echo "/app 디렉토리가 없습니다."; exit 1; }
                     EOF
                     '''
@@ -117,20 +83,22 @@ pipeline {
 
         stage('Verify Application') {
             steps {
-                script {
-                    echo '애플리케이션 상태 확인 중...'
-                    sh 'ssh testdev@${SERVER_IP} "curl -s http://localhost:3000 || exit 1"'
-                }
+                echo "Verifying the application..."
+                // 추가적인 검증을 여기서 수행할 수 있습니다.
+                // 예: curl 또는 selenium 등을 사용하여 웹 애플리케이션 검증
             }
         }
     }
 
     post {
+        always {
+            echo '파이프라인 실행 완료!'
+        }
         success {
-            echo "배포가 성공적으로 완료되었습니다."
+            echo '배포 성공!'
         }
         failure {
-            echo "배포 실패!"
+            echo '배포 실패!'
         }
     }
 }

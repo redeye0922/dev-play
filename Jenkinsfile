@@ -143,9 +143,9 @@ pipeline {
                                 docker rm -f \$CONTAINER_ID
                             fi
         
-                            # 새 컨테이너 실행
+                            # 새 컨테이너 실행, 포트 3000이 충돌한다면 3001로 변경
                             echo "Running new container from image ${imageTag}..."
-                            docker run -d --name ${IMAGE_NAME}-${BUILD_NUMBER} -p 3000:3000 ${imageTag}
+                            docker run -d --name ${IMAGE_NAME}-${BUILD_NUMBER} -p 3001:3000 ${imageTag}
         
                             # /app 디렉토리 확인
                             echo "Checking /app directory..."

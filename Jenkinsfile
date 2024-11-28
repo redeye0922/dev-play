@@ -97,6 +97,12 @@ pipeline {
                         def patch = versionParts[2].toInteger() + 1  // 패치 버전 증가
                         DOCKER_IMAGE_TAG = "${major}.${minor}.${patch}"
                     }
+
+                    // 태그가 비어 있으면 빌드를 중지합니다.
+                    if (DOCKER_IMAGE_TAG == "") {
+                        error "DOCKER_IMAGE_TAG가 설정되지 않았습니다!"
+                    }
+
                     echo "Docker image tag: ${DOCKER_IMAGE_TAG}"
                 }
             }

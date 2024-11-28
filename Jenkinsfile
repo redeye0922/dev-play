@@ -124,9 +124,8 @@ pipeline {
             steps {
                 script {
                     echo '서버에서 Docker 컨테이너 실행 중...'
-                    def sshKeyFile = '~/.ssh/id_rsa'
                     sh '''
-                        ssh -i ${sshKeyFile} testdev@${SERVER_IP} <<'EOF'
+                        ssh -i ~/.ssh/id_rsa ${sshKeyFile} testdev@${SERVER_IP} <<'EOF'
                             docker pull ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} &&
                             CONTAINER_ID=$(docker ps -q --filter name=${IMAGE_NAME})
                             if [ -n "$CONTAINER_ID" ]; then

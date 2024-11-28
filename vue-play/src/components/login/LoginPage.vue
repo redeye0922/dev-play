@@ -16,7 +16,7 @@ export default {
   methods: {
     Login() {
       this.$router.push({
-        path: "/login",
+        path: "/",
       });
     },
   },

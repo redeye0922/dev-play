@@ -122,21 +122,12 @@ pipeline {
                             # 최신 이미지를 서버에 풀어옴
                             docker pull ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} &&
         
-                            # 실행 중인 컨테이너가 있으면 중지하고 강제로 삭제
+                            # 실행 중인 컨테이너가 있으면 중지하지 않고 그냥 두기
                             CONTAINER_ID=\$(docker ps -q --filter name=${IMAGE_NAME})
                             if [ -n "\$CONTAINER_ID" ]; then
-                                echo "실행 중인 컨테이너가 있습니다. 중지하고 삭제합니다..."
-                                docker stop \$CONTAINER_ID &&
-                                docker rm -f \$CONTAINER_ID  # 강제로 삭제
+                                echo "실행 중인 컨테이너가 있습니다. 기존 컨테이너를 유지합니다..."
                             else
-                                echo "실행 중인 컨테이너가 없습니다."
-                            fi &&
-        
-                            # 모든 정지된 컨테이너 삭제
-                            STOPPED_CONTAINERS=\$(docker ps -aq --filter name=${IMAGE_NAME})
-                            if [ -n "\$STOPPED_CONTAINERS" ]; then
-                                echo "정지된 컨테이너를 삭제합니다..."
-                                docker rm -f \$STOPPED_CONTAINERS
+                                echo "실행 중인 컨테이너가 없습니다. 새로운 컨테이너를 실행합니다..."
                             fi &&
         
                             # 새로운 컨테이너 실행 (3000 포트 매핑)

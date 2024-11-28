@@ -6,9 +6,7 @@ pipeline {
         SERVER_IP = "172.29.231.196"
         IMAGE_NAME = "my-vue-app"
         DOCKER_REGISTRY = "redeye0922"  // Docker Hub 또는 사설 레지스트리
-        DOCKER_IMAGE_TAG = "${GIT_COMMIT}"
-        DOCKER_USERNAME = "redeye0922"        
-        DOCKER_PASSWORD = credentials('DOCKER_PASSWORD')  // 비밀번호는 Jenkins의 'Secret Text'로 관리
+        INITIAL_TAG = "v1.0.0"  // 초기 버전
     }
 
     triggers {
@@ -16,6 +14,41 @@ pipeline {
     }
 
     stages {
+        stage('Set Version Tag') {
+            steps {
+                script {
+                    echo '버전 태그 설정 중...'
+
+                    // Jenkins 빌드 번호를 기반으로 버전 태그 생성
+                    def buildNumber = env.BUILD_NUMBER.toInteger()
+
+                    // 버전 계산: 빌드 번호가 10 이상이면 minor를 증가
+                    def major = 1
+                    def minor = 0
+                    def patch = buildNumber
+
+                    // 패치 번호가 10 이상이면 minor 증가
+                    if (patch > 9) {
+                        patch = 0
+                        minor++
+                    }
+
+                    // minor가 10 이상이면 major 증가
+                    if (minor > 9) {
+                        minor = 0
+                        major++
+                    }
+
+                    // 새로운 태그 생성
+                    def newTag = "v${major}.${minor}.${patch}"
+                    echo "새로운 버전: ${newTag}"
+
+                    // Docker 이미지 태그 설정
+                    env.DOCKER_IMAGE_TAG = newTag
+                }
+            }
+        }
+
         stage('Checkout') {
             steps {
                 echo 'GitHub에서 코드 체크아웃 중...'
@@ -57,33 +90,22 @@ pipeline {
                 echo 'Dockerfile 생성 중...'
                 script {
                     def dockerfileContent = """
-                    # 1. Node.js 기반 이미지를 사용하여 Vue.js 빌드
+                    ARG DOCKER_REGISTRY
+                    ARG IMAGE_NAME
+                    ARG DOCKER_IMAGE_TAG
+
                     FROM node:18-slim AS build-stage
-
                     RUN mkdir -p /app
-
                     WORKDIR /app
-                    
-                    COPY ./vue-play/package*.json .  
-                    
+                    COPY ./vue-play/package*.json .
                     RUN npm install
-                    
-                    COPY . .  
-
-                    RUN echo "Contents of /app directory:" && ls -l /app
-                    
-                    WORKDIR /app/vue-play
-                    
+                    COPY . .
                     RUN npm run build
 
                     FROM node:18-slim AS production-stage
-                    
                     RUN npm install -g http-server
-                    
                     COPY --from=build-stage /app/vue-play/dist /app
-                    
                     CMD ["npx", "http-server", "/app", "-p", "3000", "-a", "0.0.0.0"]
-                    
                     EXPOSE 3000
                     """
                     writeFile(file: 'Dockerfile', text: dockerfileContent)
@@ -95,7 +117,7 @@ pipeline {
             steps {
                 script {
                     echo 'Docker 이미지 빌드 중...'
-                    sh 'DOCKER_CONTENT_TRUST=0 docker build -t ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} .'  // Docker 빌드
+                    sh "DOCKER_CONTENT_TRUST=0 docker build --build-arg DOCKER_REGISTRY=${DOCKER_REGISTRY} --build-arg IMAGE_NAME=${IMAGE_NAME} --build-arg DOCKER_IMAGE_TAG=${DOCKER_IMAGE_TAG} -t ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} ."
                 }
             }
         }
@@ -104,10 +126,12 @@ pipeline {
             steps {
                 script {
                     echo 'Docker 이미지 Docker Hub에 푸시 중...'
-                    sh '''
-                    docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
-                    docker push ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG}
-                    '''
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub-creds', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                        sh '''
+                            docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
+                            docker push ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG}
+                        '''
+                    }
                 }
             }
         }
@@ -116,35 +140,20 @@ pipeline {
             steps {
                 script {
                     echo '서버에서 Docker 컨테이너 실행 중...'
-                    sh '''
-                        ssh -i ~/.ssh/id_rsa testdev@${SERVER_IP} <<'EOF'
-                            # 최신 이미지를 서버에 풀어옴
-                            docker pull ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} &&
-        
-                            # 실행 중인 컨테이너가 있으면 중지하고 강제로 삭제
-                            CONTAINER_ID=\$(docker ps -q --filter name=${IMAGE_NAME})
-                            if [ -n "\$CONTAINER_ID" ]; then
-                                echo "실행 중인 컨테이너가 있습니다. 중지하고 삭제합니다..."
-                                docker stop \$CONTAINER_ID &&
-                                docker rm -f \$CONTAINER_ID  # 강제로 삭제
-                            else
-                                echo "실행 중인 컨테이너가 없습니다."
-                            fi &&
-        
-                            # 모든 정지된 컨테이너 삭제
-                            STOPPED_CONTAINERS=\$(docker ps -aq --filter name=${IMAGE_NAME})
-                            if [ -n "\$STOPPED_CONTAINERS" ]; then
-                                echo "정지된 컨테이너를 삭제합니다..."
-                                docker rm -f \$STOPPED_CONTAINERS
-                            fi &&
-        
-                            # 새로운 컨테이너 실행 (3000 포트 매핑)
-                            docker run -d --name ${IMAGE_NAME}-${BUILD_NUMBER} -p 3000:3000 ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} &&
-        
-                            # /app 디렉토리 확인
-                            docker exec ${IMAGE_NAME}-${BUILD_NUMBER} ls -l /app || { echo "/app 디렉토리가 없습니다."; exit 1; }
-                        EOF
-                    '''
+                    sshagent(credentials: ['my-ssh-key-id']) {
+                        sh '''
+                            ssh testdev@${SERVER_IP} <<'EOF'
+                                docker pull ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} &&
+                                CONTAINER_ID=$(docker ps -q --filter name=${IMAGE_NAME})
+                                if [ -n "$CONTAINER_ID" ]; then
+                                    docker stop $CONTAINER_ID
+                                    docker rm -f $CONTAINER_ID
+                                fi &&
+                                docker run -d --name ${IMAGE_NAME}-${BUILD_NUMBER} -p 3000:3000 ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} &&
+                                docker exec ${IMAGE_NAME}-${BUILD_NUMBER} ls -l /app || { echo "/app 디렉토리가 없습니다."; exit 1; }
+                            EOF
+                        '''
+                    }
                 }
             }
         }

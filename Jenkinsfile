@@ -80,14 +80,17 @@ pipeline {
             steps {
                 script {
                     // Git에서 마지막 태그를 가져옵니다
-                    def lastTag = sh(script: "git describe --tags --abbrev=0", returnStdout: true).trim()
-                    echo "Last Git tag: ${lastTag}"
+                    def lastTag = ""
+                    try {
+                        lastTag = sh(script: "git describe --tags --abbrev=0", returnStdout: true).trim()
+                    } catch (Exception e) {
+                        echo "No tags found. Starting from v1.0.0."
+                    }
 
-                    // 첫 번째 빌드인지 확인하고, 첫 번째 빌드는 v1.0.0으로 태깅
+                    // 첫 번째 빌드일 경우 v1.0.0, 이후에는 패치 버전 증가
                     if (lastTag == "") {
-                        DOCKER_IMAGE_TAG = "v1.0.0"  // 첫 번째 빌드일 경우
+                        DOCKER_IMAGE_TAG = "v1.0.0"
                     } else {
-                        // 마지막 태그에서 버전을 증가
                         def versionParts = lastTag.split("\\.")
                         def major = versionParts[0]
                         def minor = versionParts[1]

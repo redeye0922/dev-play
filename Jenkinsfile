@@ -129,7 +129,7 @@ pipeline {
                     // SSH 명령 실행
                     try {
                         sh """
-                            ssh -i /home/jenkins/.ssh/id_rsa testdev@${SERVER_IP} 'bash -s' <<'EOF'
+                            ssh -i /home/jenkins/.ssh/id_rsa testdev@${SERVER_IP} 'bash -s' <<EOF
                                 # 실행 중인 my-vue-app- 컨테이너 모두 중지하고 삭제
                                 CONTAINER_IDS=\$(docker ps -q --filter "name=my-vue-app-")
                                 if [ -n "\$CONTAINER_IDS" ]; then
@@ -151,7 +151,7 @@ pipeline {
                         // 배포 실패 시에도 실행 중인 컨테이너를 중지하고 삭제
                         echo "배포가 실패했습니다. 실행 중인 'my-vue-app-' 컨테이너를 중지하고 삭제합니다."
                         sh """
-                            ssh -i /home/jenkins/.ssh/id_rsa testdev@${SERVER_IP} 'bash -s' <<'EOF'
+                            ssh -i /home/jenkins/.ssh/id_rsa testdev@${SERVER_IP} 'bash -s' <<EOF
                                 CONTAINER_IDS=\$(docker ps -q --filter "name=my-vue-app-")
                                 if [ -n "\$CONTAINER_IDS" ]; then
                                     echo "Stopping and removing existing 'my-vue-app-' containers..."
@@ -166,7 +166,6 @@ pipeline {
                 }
             }
         }
-
         
         stage('Verify Application') {
             steps {

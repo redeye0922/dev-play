@@ -126,12 +126,9 @@ pipeline {
                     echo '서버에서 Docker 컨테이너 실행 중...'
                     def imageTag = "${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
         
-                    // 태그 값 확인을 위한 디버깅 출력
-                    echo "Using Docker image: ${imageTag}"
-        
                     // SSH 명령 실행
                     sh """
-                        ssh -i /home/jenkins/.ssh/id_rsa testdev@${SERVER_IP} << EOF
+                        ssh -i /home/jenkins/.ssh/id_rsa testdev@${SERVER_IP} << 'EOF'
                             echo "Pulling Docker image ${imageTag}..."
                             docker pull ${imageTag}
         
@@ -143,7 +140,7 @@ pipeline {
                                 docker rm -f \$CONTAINER_ID
                             fi
         
-                            # 새 컨테이너 실행, 포트 3000이 충돌한다면 3001로 변경
+                            # 새 컨테이너 실행
                             echo "Running new container from image ${imageTag}..."
                             docker run -d --name ${IMAGE_NAME}-${BUILD_NUMBER} -p 3001:3000 ${imageTag}
         

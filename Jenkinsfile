@@ -172,21 +172,32 @@ pipeline {
                     
                     // 서버에서 Docker 컨테이너 실행
                     //sshagent([SSH_KEY]) {
-                        sh '''
-                        ssh -i ~/.ssh/id_rsa testdev@${SERVER_IP} <<EOF
-                            # 최신 이미지를 서버에 풀어옴
-                            docker pull ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} &&
-        
-                            # 이전 컨테이너가 있다면 중지하고 삭제
-                            docker stop \$(docker ps -q --filter name=${IMAGE_NAME}) &&
-                            docker rm \$(docker ps -aq --filter name=${IMAGE_NAME}) &&
-        
-                            # 새로운 컨테이너 실행 (3000 포트 매핑)
-                            docker run -d --name ${IMAGE_NAME} -p 3000:3000 ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} &&
-        
-                            # /app 디렉토리 확인
-                            docker exec ${IMAGE_NAME} ls -l /app || echo "/app 디렉토리가 없습니다."        
-                        EOF
+                        sh '''                        
+                            ssh -i ~/.ssh/id_rsa testdev@${SERVER_IP} <<EOF
+                                # 최신 이미지를 서버에 풀어옴
+                                docker pull ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} &&
+                        
+                                # 이전 컨테이너가 있다면 중지하고 삭제
+                                CONTAINER_ID=\$(docker ps -q --filter name=${IMAGE_NAME})
+                                if [ -n "\$CONTAINER_ID" ]; then
+                                    docker stop \$CONTAINER_ID &&
+                                    docker rm \$CONTAINER_ID
+                                else
+                                    echo "실행 중인 컨테이너가 없습니다."
+                                fi &&
+                        
+                                # 모든 정지된 컨테이너 삭제
+                                STOPPED_CONTAINERS=\$(docker ps -aq --filter name=${IMAGE_NAME})
+                                if [ -n "\$STOPPED_CONTAINERS" ]; then
+                                    docker rm \$STOPPED_CONTAINERS
+                                fi &&
+                        
+                                # 새로운 컨테이너 실행 (3000 포트 매핑)
+                                docker run -d --name ${IMAGE_NAME} -p 3000:3000 ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} &&
+                        
+                                # /app 디렉토리 확인
+                                docker exec ${IMAGE_NAME} ls -l /app || echo "/app 디렉토리가 없습니다."
+                            EOF
                         '''
                     //}                    
                 }

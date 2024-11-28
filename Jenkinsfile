@@ -124,20 +124,19 @@ pipeline {
             steps {
                 script {
                     echo '서버에서 Docker 컨테이너 실행 중...'
-                    sshagent(credentials: ['my-ssh-key-id']) {
-                        sh '''
-                            ssh testdev@${SERVER_IP} <<'EOF'
-                                docker pull ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} &&
-                                CONTAINER_ID=$(docker ps -q --filter name=${IMAGE_NAME})
-                                if [ -n "$CONTAINER_ID" ]; then
-                                    docker stop $CONTAINER_ID
-                                    docker rm -f $CONTAINER_ID
-                                fi &&
-                                docker run -d --name ${IMAGE_NAME}-${BUILD_NUMBER} -p 3000:3000 ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} &&
-                                docker exec ${IMAGE_NAME}-${BUILD_NUMBER} ls -l /app || { echo "/app 디렉토리가 없습니다."; exit 1; }
-                            EOF
-                        '''
-                    }
+                    def sshKeyFile = '~/.ssh/id_rsa'
+                    sh '''
+                        ssh -i ${sshKeyFile} testdev@${SERVER_IP} <<'EOF'
+                            docker pull ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} &&
+                            CONTAINER_ID=$(docker ps -q --filter name=${IMAGE_NAME})
+                            if [ -n "$CONTAINER_ID" ]; then
+                                docker stop $CONTAINER_ID
+                                docker rm -f $CONTAINER_ID
+                            fi &&
+                            docker run -d --name ${IMAGE_NAME}-${BUILD_NUMBER} -p 3000:3000 ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} &&
+                            docker exec ${IMAGE_NAME}-${BUILD_NUMBER} ls -l /app || { echo "/app 디렉토리가 없습니다."; exit 1; }
+                        EOF
+                    '''
                 }
             }
         }

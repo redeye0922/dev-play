@@ -7,6 +7,7 @@ pipeline {
         IMAGE_NAME = "my-vue-app"
         DOCKER_REGISTRY = "redeye0922"
         INITIAL_TAG = "v1.0.0"
+        PORT = "3000" // 배포할 포트 설정 (컨테이너에서 노출한 포트)
     }
 
     stages {
@@ -79,7 +80,7 @@ pipeline {
                     FROM node:18-slim AS build-stage
                     RUN mkdir -p /app
                     WORKDIR /app
-                    COPY ./vue-play/package*.json .
+                    COPY ./vue-play/package*.json . 
                     RUN npm install
                     COPY ./vue-play /app
                     RUN echo "Contents of /app directory:" && ls -l /app
@@ -147,7 +148,7 @@ pipeline {
                         sh """
                             ssh -i /home/jenkins/.ssh/id_rsa testdev@${SERVER_IP} '
                                 echo "Running new container from image ${imageTag}..."
-                                docker run -d --name ${IMAGE_NAME}-${BUILD_NUMBER} -p 3001:3000 ${imageTag}
+                                docker run -d --name ${IMAGE_NAME}-${BUILD_NUMBER} -p ${PORT}:3000 ${imageTag}
                             '
                         """
         
@@ -162,7 +163,7 @@ pipeline {
                         // 애플리케이션 상태 확인
                         echo '애플리케이션 상태 확인 중...'
                         sh """
-                            ssh testdev@${SERVER_IP} 'sleep 10 && curl -s http://localhost:3001 || exit 1'
+                            ssh testdev@${SERVER_IP} 'sleep 10 && curl -s http://localhost:${PORT} || exit 1'
                         """
                     } catch (Exception e) {
                         // 배포 실패 시에도 실행 중인 컨테이너를 중지하고 삭제
@@ -185,12 +186,13 @@ pipeline {
                 }
             }
         }
-        
-        stage('Verify Application') {
+
+        stage('Open Browser') {
             steps {
                 script {
-                    echo '애플리케이션 상태 확인 중...'
-                    sh 'ssh testdev@${SERVER_IP} "curl -s http://localhost:3000 || exit 1"'
+                    echo '브라우저를 열어 애플리케이션을 확인 중...'
+                    // 브라우저를 열도록 로컬에서 커맨드를 실행
+                    sh 'export DISPLAY=:0 && google-chrome --new-window http://localhost:${PORT} &'
                 }
             }
         }

@@ -5,12 +5,11 @@ pipeline {
         DEPLOY_DIR = "/home/testdev/devspace"
         SERVER_IP = "172.29.231.196"
         IMAGE_NAME = "my-vue-app"
-        DOCKER_REGISTRY = "redeye0922"  // Docker Hub 또는 사설 레지스트리
-        DOCKER_IMAGE_TAG = "${BUILD_TIMESTAMP}"
+        DOCKER_REGISTRY = "redeye0922"  // Docker Hub 또는 사설 레지스트리        
         DOCKER_USERNAME = "redeye0922"
         DOCKER_PASSWORD = credentials('DOCKER_PASSWORD')  // 비밀번호는 Jenkins의 'Secret Text'로 관리
         BUILD_TIMESTAMP = "${new Date().format('yyyyMMddHHmmss')}"
-        BUILD_TAG = "${BUILD_TIMESTAMP}-${BUILD_NUMBER}"
+        DOCKER_IMAGE_TAG = "${BUILD_TIMESTAMP}-${BUILD_NUMBER}"
     }
 
     triggers {
@@ -96,7 +95,7 @@ pipeline {
         stage('Show Timestamp and Tag') {
             steps {
                 echo "Build timestamp: ${BUILD_TIMESTAMP}"
-                echo "Build tag: ${BUILD_TAG}"
+                echo "Build tag: ${DOCKER_IMAGE_TAG}"
             }
         }
         

@@ -105,7 +105,7 @@ pipeline {
                 script {
                     echo 'Docker 이미지 Docker Hub에 푸시 중...'
                     sh '''
-                    docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
+                    echo "${DOCKER_PASSWORD}" | docker login -u ${DOCKER_USERNAME} --password-stdin
                     docker push ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG}
                     '''
                 }

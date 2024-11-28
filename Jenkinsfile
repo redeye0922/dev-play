@@ -79,6 +79,9 @@ pipeline {
                     def dockerfileContent = """
                     # 1. Node.js 기반 이미지를 사용하여 Vue.js 빌드
                     FROM node:18-slim AS build-stage
+
+                    # 컨테이너 실행시 /app 디렉토리가 없다하여 명시적으로 생성
+                    RUN mkdir -p /app
                     
                     # 2. 작업 디렉토리 설정
                     WORKDIR /app
@@ -182,8 +185,7 @@ pipeline {
                             docker run -d --name ${IMAGE_NAME} -p 3000:3000 ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} &&
         
                             # /app 디렉토리 확인
-                            docker exec ${IMAGE_NAME} ls -l /app || echo "/app 디렉토리가 없습니다."
-        
+                            docker exec ${IMAGE_NAME} ls -l /app || echo "/app 디렉토리가 없습니다."        
                         EOF
                         '''
                     //}                    

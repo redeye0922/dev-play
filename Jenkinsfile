@@ -130,48 +130,48 @@ pipeline {
                     try {
                         // 기존 컨테이너 중지 및 삭제
                         sh """
-                            ssh -i /home/jenkins/.ssh/id_rsa testdev@${SERVER_IP} "
+                            ssh -i /home/jenkins/.ssh/id_rsa testdev@${SERVER_IP} '
                                 # 기존 실행 중인 my-vue-app- 컨테이너들 찾기
-                                CONTAINER_IDS=\$(docker ps -q --filter 'name=my-vue-app-')
-                                if [ -n \"\$CONTAINER_IDS\" ]; then
-                                    echo 'Stopping and removing existing my-vue-app- containers...'
+                                CONTAINER_IDS=\$(docker ps -q --filter "name=my-vue-app-")
+                                if [ -n "\$CONTAINER_IDS" ]; then
+                                    echo "Stopping and removing existing my-vue-app- containers..."
                                     docker stop \$CONTAINER_IDS
                                     docker rm -f \$CONTAINER_IDS
                                 else
-                                    echo 'No existing my-vue-app- containers to stop.'
+                                    echo "No existing my-vue-app- containers to stop."
                                 fi
-                            "
+                            '
                         """
                         
                         // 새 컨테이너 실행
                         sh """
-                            ssh -i /home/jenkins/.ssh/id_rsa testdev@${SERVER_IP} "
-                                echo 'Running new container from image ${imageTag}...'
+                            ssh -i /home/jenkins/.ssh/id_rsa testdev@${SERVER_IP} '
+                                echo "Running new container from image ${imageTag}..."
                                 docker run -d --name ${IMAGE_NAME}-${BUILD_NUMBER} -p 3001:3000 ${imageTag}
-                            "
+                            '
                         """
         
                         // /app 디렉토리 확인
                         sh """
-                            ssh -i /home/jenkins/.ssh/id_rsa testdev@${SERVER_IP} "
-                                echo 'Checking /app directory...'
-                                docker exec ${IMAGE_NAME}-${BUILD_NUMBER} ls -l /app || { echo '/app 디렉토리가 없습니다.'; exit 1; }
-                            "
+                            ssh -i /home/jenkins/.ssh/id_rsa testdev@${SERVER_IP} '
+                                echo "Checking /app directory..."
+                                docker exec ${IMAGE_NAME}-${BUILD_NUMBER} ls -l /app || { echo "/app 디렉토리가 없습니다."; exit 1; }
+                            '
                         """
                     } catch (Exception e) {
                         // 배포 실패 시에도 실행 중인 컨테이너를 중지하고 삭제
                         echo "배포가 실패했습니다. 실행 중인 'my-vue-app-' 컨테이너를 중지하고 삭제합니다."
                         sh """
-                            ssh -i /home/jenkins/.ssh/id_rsa testdev@${SERVER_IP} "
-                                CONTAINER_IDS=\$(docker ps -q --filter 'name=my-vue-app-')
-                                if [ -n \"\$CONTAINER_IDS\" ]; then
-                                    echo 'Stopping and removing existing my-vue-app- containers...'
+                            ssh -i /home/jenkins/.ssh/id_rsa testdev@${SERVER_IP} '
+                                CONTAINER_IDS=\$(docker ps -q --filter "name=my-vue-app-")
+                                if [ -n "\$CONTAINER_IDS" ]; then
+                                    echo "Stopping and removing existing my-vue-app- containers..."
                                     docker stop \$CONTAINER_IDS
                                     docker rm -f \$CONTAINER_IDS
                                 else
-                                    echo 'No existing my-vue-app- containers to stop.'
+                                    echo "No existing my-vue-app- containers to stop."
                                 fi
-                            "
+                            '
                         """
                         // 배포 실패 후 오류 발생
                         throw e
@@ -179,6 +179,7 @@ pipeline {
                 }
             }
         }
+
         
         stage('Verify Application') {
             steps {

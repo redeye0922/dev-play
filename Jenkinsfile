@@ -8,7 +8,7 @@ pipeline {
         MAJOR = 1
         MINOR = 0
         PATCH = 0
-        DOCKER_IMAGE_TAG = "v${MAJOR}.${MINOR}.${PATCH}"  // 태그를 v1.0.0으로 설정
+        DOCKER_IMAGE_TAG = "v${MAJOR}.${MINOR}.${PATCH}"  // 초기 태그 (v1.0.0)
         SERVER_IP = "172.29.231.196"
     }
 
@@ -97,6 +97,7 @@ pipeline {
                     } else {
                         PATCH += 1
                     }
+                    // 새로 증가된 버전으로 업데이트
                     DOCKER_IMAGE_TAG = "${MAJOR}.${MINOR}.${PATCH}"
                     echo "새 버전: ${DOCKER_IMAGE_TAG}"
                 }
@@ -107,6 +108,7 @@ pipeline {
             steps {
                 script {
                     echo 'Docker 이미지 빌드 중...'
+                    // 버전 증가 후 새로운 태그 사용
                     sh "DOCKER_CONTENT_TRUST=0 docker build -t ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} ."
                 }
             }
@@ -116,6 +118,7 @@ pipeline {
             steps {
                 script {
                     echo 'Docker 이미지 Docker Hub에 푸시 중...'
+                    // 버전 증가 후 태그 사용
                     sh '''
                     echo "${DOCKER_PASSWORD}" | docker login -u ${DOCKER_REGISTRY} --password-stdin
                     docker push ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG}

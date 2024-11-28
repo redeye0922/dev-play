@@ -5,45 +5,32 @@ pipeline {
         DEPLOY_DIR = "/home/testdev/devspace"
         SERVER_IP = "172.29.231.196"
         IMAGE_NAME = "my-vue-app"
-        DOCKER_REGISTRY = "redeye0922"  // Docker Hub 또는 사설 레지스트리
-        INITIAL_TAG = "v1.0.0"  // 초기 버전
-    }
-
-    triggers {
-        githubPush()  // GitHub webhook을 통해 자동 트리거
+        DOCKER_REGISTRY = "redeye0922"
+        INITIAL_TAG = "v1.0.0"
     }
 
     stages {
         stage('Set Version Tag') {
             steps {
                 script {
-                    echo '버전 태그 설정 중...'
-
-                    // Jenkins 빌드 번호를 기반으로 버전 태그 생성
                     def buildNumber = env.BUILD_NUMBER.toInteger()
-
-                    // 버전 계산: 빌드 번호가 10 이상이면 minor를 증가
                     def major = 1
                     def minor = 0
                     def patch = buildNumber
 
-                    // 패치 번호가 10 이상이면 minor 증가
                     if (patch > 9) {
                         patch = 0
                         minor++
                     }
 
-                    // minor가 10 이상이면 major 증가
                     if (minor > 9) {
                         minor = 0
                         major++
                     }
 
-                    // 새로운 태그 생성
                     def newTag = "v${major}.${minor}.${patch}"
                     echo "새로운 버전: ${newTag}"
 
-                    // Docker 이미지 태그 설정
                     env.DOCKER_IMAGE_TAG = newTag
                 }
             }
@@ -51,25 +38,20 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                echo 'GitHub에서 코드 체크아웃 중...'
-                checkout scm  // scm에서 체크아웃
+                checkout scm
             }
         }
 
         stage('Remove swagger-play') {
             steps {
-                echo '불필요한 swagger-play 폴더 삭제 중...'
-                sh 'rm -rf swagger-play'  // 불필요한 디렉토리 삭제
+                sh 'rm -rf swagger-play'
             }
         }
 
         stage('Install Dependencies') {
             steps {
                 dir('vue-play') {
-                    script {
-                        echo 'npm 의존성 설치 중...'
-                        sh 'npm install'  // 의존성 설치
-                    }
+                    sh 'npm install'
                 }
             }
         }
@@ -79,7 +61,7 @@ pipeline {
                 dir('vue-play') {
                     script {
                         echo 'Vue 앱 빌드 중...'
-                        sh 'npm run build'  // 빌드 명령어 실행
+                        sh 'npm run build'  // 빌드가 제대로 되는지 확인
                     }
                 }
             }
@@ -99,12 +81,14 @@ pipeline {
                     WORKDIR /app
                     COPY ./vue-play/package*.json .
                     RUN npm install
-                    COPY . .
+                    COPY ./vue-play /app
+                    RUN echo "Contents of /app directory:" && ls -l /app
+                    WORKDIR /app
                     RUN npm run build
 
                     FROM node:18-slim AS production-stage
                     RUN npm install -g http-server
-                    COPY --from=build-stage /app/vue-play/dist /app
+                    COPY --from=build-stage /app/dist /app
                     CMD ["npx", "http-server", "/app", "-p", "3000", "-a", "0.0.0.0"]
                     EXPOSE 3000
                     """

@@ -170,7 +170,7 @@ pipeline {
                     // 서버에서 Docker 컨테이너 실행
                     //sshagent([SSH_KEY]) {
                         sh '''
-                        ssh -i ~/.ssh/authorized_keys testdev@${SERVER_IP} <<EOF
+                        ssh -i ~/.ssh/id_rsa testdev@${SERVER_IP} <<EOF
                             # 최신 이미지를 서버에 풀어옴
                             docker pull ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} &&
         

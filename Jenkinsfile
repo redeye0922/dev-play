@@ -2,16 +2,13 @@ pipeline {
     agent any
     
     environment {
-        //ssh key를 testdev-ssh-key로 입력했는데 ssh-key-SSH_KEY를 찾고있어서 오류발생 
-        //sshagent에서 아이디 바뀌어 들어가는것 같은데 확인 못해봐서 직접 입력하게 수정해야겠음
-        //SSH_KEY = credentials('ssh-key-SSH_KEY')   // Jenkins 자격 증명에서 SSH 키 ID
         DEPLOY_DIR = "/home/testdev/devspace"
         SERVER_IP = "172.29.231.196"
         IMAGE_NAME = "my-vue-app"
         DOCKER_REGISTRY = "redeye0922"  // Docker Hub 또는 사설 레지스트리
         DOCKER_IMAGE_TAG = "${GIT_COMMIT}"
         DOCKER_USERNAME = "redeye0922"
-        DOCKER_PASSWORD = "**jh7425**"       
+        DOCKER_PASSWORD = "**jh7425**"
     }
 
     triggers {
@@ -70,79 +67,51 @@ pipeline {
                 sh 'ls -l vue-play'  // vue-play 디렉토리가 존재하는지 확인
             }
         }
-        
+
         stage('Generate Dockerfile') {
             steps {
                 echo 'Dockerfile 생성중...'
                 script {
-                    // Dockerfile을 동적으로 생성
                     def dockerfileContent = """
                     # 1. Node.js 기반 이미지를 사용하여 Vue.js 빌드
                     FROM node:18-slim AS build-stage
 
-                    # 컨테이너 실행시 /app 디렉토리가 없다하여 명시적으로 생성
                     RUN mkdir -p /app
-                    
-                    # 2. 작업 디렉토리 설정
+
                     WORKDIR /app
                     
-                    # 3. vue-play 디렉토리 내의 package.json을 복사
                     COPY ./vue-play/package*.json .  
                     
-                    # 4. 종속성 설치
                     RUN npm install
                     
-                    # 5. vue-play 폴더의 소스 코드 복사
                     COPY . .  
 
-                    # /app 디렉토리의 파일 목록 확인
                     RUN echo "Contents of /app directory:" && ls -l /app
                     
-                    # 6. vue-play 디렉토리로 이동
                     WORKDIR /app/vue-play
                     
-                    # 7. Vue.js 프로젝트 빌드
                     RUN npm run build
 
-                    # http-server를 전역으로 설치
-                    RUN npm install http-server --save-dev
-
-                    # 8. Serve 패키지를 사용하여 정적 파일 서빙
                     FROM node:18-slim AS production-stage
                     
-                    # 9. serve 패키지 설치
                     RUN npm install -g http-server
                     
-                    # 10. 빌드된 파일을 production-stage로 복사
                     COPY --from=build-stage /app/vue-play/dist /app
                     
-                    # 11. serve로 정적 파일 서빙
                     CMD ["npx", "http-server", "/app", "-p", "3000", "-a", "0.0.0.0"]
                     
-                    # 12. 3000 포트 노출
                     EXPOSE 3000
                     """
-                    // Jenkins 워크스페이스에 Dockerfile 생성
                     writeFile(file: 'Dockerfile', text: dockerfileContent)
                 }
             }
         }
 
-        stage('Check Build Docker Image Exec Workspace') {
-            steps {
-                script {
-                    echo "Docker 이미지 빌드 경로: ${pwd()}"
-                }
-            }
-        }
-        
         stage('Build Docker Image') {
             steps {
                 script {
-                    //DOCKER_CONTENT_TRUST=0 이미지 서명 검증 비활성화 TLS 문제 우회처리
                     echo 'Docker 이미지 빌드 중...'
                     sh '''                   
-                    # Docker 빌드 실행
                     DOCKER_CONTENT_TRUST=0 docker build -t ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} .                    
                     '''
                 }
@@ -153,63 +122,55 @@ pipeline {
             steps {
                 script {
                     echo 'Docker 이미지 Docker Hub에 푸시 중...'
-                    // Docker Hub 또는 사설 레지스트리에 푸시
                     sh '''
-                    # Docker Hub 로그인
                     docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
-                    
-                    # Docker 이미지를 푸시
                     docker push ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG}
                     '''
                 }
             }
         }
 
-      stage('Deploy to Server') {
+        stage('Deploy to Server') {
             steps {
                 script {
                     echo '서버에서 Docker 컨테이너 실행 중...'
                     
-                    // 서버에서 Docker 컨테이너 실행
-                    //sshagent([SSH_KEY]) {
-                        sh '''
-                            ssh -i ~/.ssh/id_rsa testdev@${SERVER_IP} <<EOF
-                                # 최신 이미지를 서버에 풀어옴
-                                docker pull ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} &&
-                        
-                                # 이전 컨테이너가 있다면 중지하고 삭제
-                                CONTAINER_ID=\$(docker ps -q --filter name=${IMAGE_NAME})
-                                if [ -n "\$CONTAINER_ID" ]; then
-                                    docker stop \$CONTAINER_ID &&
-                                    docker rm \$CONTAINER_ID
-                                else
-                                    echo "실행 중인 컨테이너가 없습니다."
-                                fi &&
-                        
-                                # 모든 정지된 컨테이너 삭제
-                                STOPPED_CONTAINERS=\$(docker ps -aq --filter name=${IMAGE_NAME})
-                                if [ -n "\$STOPPED_CONTAINERS" ]; then
-                                    docker rm \$STOPPED_CONTAINERS
-                                fi &&
-                        
-                                # 새로운 컨테이너 실행 (3000 포트 매핑)
-                                docker run -d --name ${IMAGE_NAME} -p 3000:3000 ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} &&
-                        
-                                # /app 디렉토리 확인
-                                docker exec ${IMAGE_NAME} ls -l /app || echo "/app 디렉토리가 없습니다."
+                    // SSH를 통해 서버에서 Docker 명령어 실행
+                    sh '''
+                        ssh -i ~/.ssh/id_rsa testdev@${SERVER_IP} <<EOF
+                            # 최신 이미지를 서버에 풀어옴
+                            docker pull ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} &&
+                
+                            # 이전 컨테이너가 있다면 중지하고 강제로 삭제
+                            CONTAINER_ID=\$(docker ps -q --filter name=${IMAGE_NAME})
+                            if [ -n "\$CONTAINER_ID" ]; then
+                                docker stop \$CONTAINER_ID &&
+                                docker rm -f \$CONTAINER_ID # 강제로 컨테이너 삭제
+                            else
+                                echo "실행 중인 컨테이너가 없습니다."
+                            fi &&
+                
+                            # 모든 정지된 컨테이너 삭제
+                            STOPPED_CONTAINERS=\$(docker ps -aq --filter name=${IMAGE_NAME})
+                            if [ -n "\$STOPPED_CONTAINERS" ]; then
+                                docker rm \$STOPPED_CONTAINERS
+                            fi &&
+                
+                            # 새로운 컨테이너 실행 (3000 포트 매핑)
+                            docker run -d --name ${IMAGE_NAME} -p 3000:3000 ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} &&
+                
+                            # /app 디렉토리 확인
+                            docker exec ${IMAGE_NAME} ls -l /app || echo "/app 디렉토리가 없습니다."
                         EOF
-                        '''
-                    //}                    
+                    '''
                 }
             }
         }
-
 
         stage('Verify Application') {
             steps {
                 script {
                     echo '애플리케이션 상태 확인 중...'
-                    // pm2 상태 확인 또는 Docker 컨테이너 상태 확인
                     sh 'ssh testdev@${SERVER_IP} "docker ps -a"'
                 }
             }
@@ -226,4 +187,3 @@ pipeline {
         }
     }
 }
-

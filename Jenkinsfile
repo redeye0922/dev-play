@@ -15,6 +15,7 @@ pipeline {
 
         // Docker 이미지 태그
         DOCKER_IMAGE_TAG = "${MAJOR}.${MINOR}.${PATCH}"
+        SERVER_IP = "172.29.231.196"  // 실제 서버의 IP 주소를 입력하세요.
     }
 
     triggers {

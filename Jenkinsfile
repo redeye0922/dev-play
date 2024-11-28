@@ -128,23 +128,20 @@ pipeline {
         
                     // SSH 명령 실행
                     sh """
-                        ssh -i /home/jenkins/.ssh/id_rsa testdev@${SERVER_IP} << 'EOF'
+                        ssh -i /home/jenkins/.ssh/id_rsa testdev@${SERVER_IP} 'bash -s' << EOF
                             echo "Pulling Docker image ${imageTag}..."
                             docker pull ${imageTag}
-        
-                            # 기존 컨테이너가 실행 중이면 중지하고 삭제
+                    
                             CONTAINER_ID=\$(docker ps -q --filter name=${IMAGE_NAME})
                             if [ -n "\$CONTAINER_ID" ]; then
                                 echo "Stopping and removing existing container..."
                                 docker stop \$CONTAINER_ID
                                 docker rm -f \$CONTAINER_ID
                             fi
-        
-                            # 새 컨테이너 실행
+                    
                             echo "Running new container from image ${imageTag}..."
                             docker run -d --name ${IMAGE_NAME}-${BUILD_NUMBER} -p 3001:3000 ${imageTag}
-        
-                            # /app 디렉토리 확인
+                    
                             echo "Checking /app directory..."
                             docker exec ${IMAGE_NAME}-${BUILD_NUMBER} ls -l /app || { echo "/app 디렉토리가 없습니다."; exit 1; }
                         EOF

@@ -133,10 +133,10 @@ pipeline {
                                 echo "Pulling Docker image ${imageTag}..."
                                 docker pull ${imageTag}
         
-                                # 기존에 'my-vue-app'으로 시작하는 컨테이너가 있으면 중지하고 삭제
-                                CONTAINER_IDS=\$(docker ps -q --filter "name=my-vue-app")
+                                # 기존에 'my-vue-app-'으로 시작하는 컨테이너가 있으면 중지하고 삭제
+                                CONTAINER_IDS=\$(docker ps -q --filter "name=my-vue-app-")
                                 if [ -n "\$CONTAINER_IDS" ]; then
-                                    echo "Stopping and removing existing 'my-vue-app' containers..."
+                                    echo "Stopping and removing existing 'my-vue-app-' containers..."
                                     docker stop \$CONTAINER_IDS
                                     docker rm -f \$CONTAINER_IDS
                                 fi
@@ -151,13 +151,13 @@ pipeline {
                             EOF
                         """
                     } catch (Exception e) {
-                        // 배포 실패 시 컨테이너 중지 및 제거
-                        echo "배포가 실패했습니다. 실행 중인 'my-vue-app' 컨테이너를 중지하고 삭제합니다."
+                        // 배포 실패 시 'my-vue-app-' 컨테이너 중지 및 제거
+                        echo "배포가 실패했습니다. 실행 중인 'my-vue-app-' 컨테이너를 중지하고 삭제합니다."
                         sh """
                             ssh -i /home/jenkins/.ssh/id_rsa testdev@${SERVER_IP} 'bash -s' << EOF
-                                CONTAINER_IDS=\$(docker ps -q --filter "name=my-vue-app")
+                                CONTAINER_IDS=\$(docker ps -q --filter "name=my-vue-app-")
                                 if [ -n "\$CONTAINER_IDS" ]; then
-                                    echo "Stopping and removing existing 'my-vue-app' containers..."
+                                    echo "Stopping and removing existing 'my-vue-app-' containers..."
                                     docker stop \$CONTAINER_IDS
                                     docker rm -f \$CONTAINER_IDS
                                 fi

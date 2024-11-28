@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_REGISTRY = 'docker.io'  // Docker Hub 사용시 'docker.io'
-        IMAGE_NAME = 'redeye0922/my-vue-app'  // 사용자명 + 이미지 이름
+        DOCKER_REGISTRY = 'redeye0922'  // Docker Hub 사용자명으로 수정
+        IMAGE_NAME = 'my-vue-app'  // 이미지 이름만 지정
         BUILD_NUMBER = "${env.BUILD_NUMBER}"
         SERVER_IP = '172.29.231.196'  // 정확한 서버 IP
         GITHUB_REPO = 'https://github.com/redeye0922/dev-play.git' // GitHub 리포지토리 URL

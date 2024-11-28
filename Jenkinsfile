@@ -8,7 +8,7 @@ pipeline {
         MAJOR = 1
         MINOR = 0
         PATCH = 0
-        DOCKER_IMAGE_TAG = "v${MAJOR}.${MINOR}.${PATCH}"
+        DOCKER_IMAGE_TAG = "v${MAJOR}.${MINOR}.${PATCH}"  // 태그를 v1.0.0으로 설정
         SERVER_IP = "172.29.231.196"
     }
 

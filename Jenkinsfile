@@ -128,10 +128,10 @@ pipeline {
         
                     // SSH 명령 실행
                     sh """
-                        ssh -i ~/.ssh/id_rsa testdev@${SERVER_IP} 'bash -s' << EOF
+                        ssh -i /home/jenkins/.ssh/id_rsa testdev@${SERVER_IP} 'bash -s' << EOF
                             echo "Pulling Docker image ${imageTag}..."
                             docker pull ${imageTag}
-                        
+        
                             # 기존 컨테이너가 실행 중이면 중지하고 삭제
                             CONTAINER_ID=\$(docker ps -q --filter name=${IMAGE_NAME})
                             if [ -n "\$CONTAINER_ID" ]; then
@@ -139,18 +139,11 @@ pipeline {
                                 docker stop \$CONTAINER_ID
                                 docker rm -f \$CONTAINER_ID
                             fi
-                        
-                            # 포트가 이미 사용 중이면 다른 포트를 시도
-                            PORT=3001
-                            while docker ps -q --filter "publish=\$PORT" | grep -q .; do
-                                echo "Port \$PORT is already in use, trying another port..."
-                                PORT=\$((PORT + 1))
-                            done
-                        
+        
                             # 새 컨테이너 실행
-                            echo "Running new container from image ${imageTag} on port \$PORT..."
-                            docker run -d --name ${IMAGE_NAME}-${BUILD_NUMBER} -p \$PORT:3000 ${imageTag}
-                        
+                            echo "Running new container from image ${imageTag} on port 3001..."
+                            docker run -d --name ${IMAGE_NAME}-${BUILD_NUMBER} -p 3001:3000 ${imageTag}
+        
                             # /app 디렉토리 확인
                             echo "Checking /app directory..."
                             docker exec ${IMAGE_NAME}-${BUILD_NUMBER} ls -l /app || { echo "/app 디렉토리가 없습니다."; exit 1; }

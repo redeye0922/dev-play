@@ -1,6 +1,11 @@
 pipeline {
     agent any
 
+    triggers {
+        // GitHub Hook 트리거 설정
+        githubPush()     //GitHub에서 푸시 이벤트가 발생할 때 빌드를 트리거
+    }
+    
     environment {
         DEPLOY_DIR = "/home/testdev/devspace"
         SERVER_IP = "172.29.231.196"

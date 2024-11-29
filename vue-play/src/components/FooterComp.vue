@@ -1,3 +1,3 @@
 <template>
-  <div> copy right 2024.06 && webhook test </div>
+  <div> copy right 2024.06 </div>
 </template>

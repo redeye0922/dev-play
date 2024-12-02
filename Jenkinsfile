@@ -191,16 +191,6 @@ pipeline {
                 }
             }
         }
-
-        stage('Open Browser') {
-            steps {
-                script {
-                    echo '브라우저를 열어 애플리케이션을 확인 중...'
-                    // 브라우저를 열도록 로컬에서 커맨드를 실행
-                    sh 'export DISPLAY=:0 && google-chrome --new-window http://localhost:${PORT} &'
-                }
-            }
-        }
     }
 
     post {

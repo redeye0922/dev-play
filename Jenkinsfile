@@ -48,9 +48,14 @@ pipeline {
             }
         }
 
+        stage('Remove svelte-play') {
+            steps {
+                sh 'rm -rf svelte-play*'
+            }
+        }
         stage('Remove swagger-play') {
             steps {
-                sh 'rm -rf swagger-play'
+                sh 'rm -rf swagger-play*'
             }
         }
 

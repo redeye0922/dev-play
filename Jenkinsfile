@@ -2,8 +2,7 @@ pipeline {
     agent any
 
     triggers {
-        // GitHub Hook 트리거 설정
-        githubPush()     //GitHub에서 푸시 이벤트가 발생할 때 빌드를 트리거
+        githubPush()
     }
     
     environment {
@@ -12,7 +11,7 @@ pipeline {
         IMAGE_NAME = "my-vue-app"
         DOCKER_REGISTRY = "redeye0922"
         INITIAL_TAG = "v1.0.0"
-        PORT = "3000" // 배포할 포트 설정 (컨테이너에서 노출한 포트)
+        PORT = "3000"
     }
 
     stages {
@@ -53,6 +52,7 @@ pipeline {
                 sh 'rm -rf svelte-play*'
             }
         }
+
         stage('Remove swagger-play') {
             steps {
                 sh 'rm -rf swagger-play*'
@@ -72,7 +72,7 @@ pipeline {
                 dir('vue-play') {
                     script {
                         echo 'Vue 앱 빌드 중...'
-                        sh 'npm run build'  // 빌드가 제대로 되는지 확인
+                        sh 'npm run build'
                     }
                 }
             }
@@ -136,17 +136,18 @@ pipeline {
                 script {
                     echo '서버에서 Docker 컨테이너 실행 중...'
                     def imageTag = "${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
-                    // 호스트 키 제거 및 추가 
-                    sh """ ssh-keygen -f "/home/jenkins/.ssh/known_hosts" -R "${SERVER_IP}" 
-                           ssh-keyscan -p 2222 -H ${SERVER_IP} >> /home/jenkins/.ssh/known_hosts 
-                    """
                     
+                    // 호스트 키 제거 및 추가
+                    sh """
+                        ssh-keygen -f "/home/jenkins/.ssh/known_hosts" -R "${SERVER_IP}"
+                        ssh-keyscan -p 2222 -H ${SERVER_IP} >> /home/jenkins/.ssh/known_hosts
+                    """
+        
                     // SSH 명령 실행
                     try {
                         // 기존 컨테이너 중지 및 삭제
                         sh """
-                            ssh -i /home/jenkins/.ssh/id_rsa testdev@${SERVER_IP} '
-                                # 기존 실행 중인 my-vue-app- 컨테이너들 찾기
+                            ssh -o StrictHostKeyChecking=no -i /home/jenkins/.ssh/id_rsa -p 2222 testdev@${SERVER_IP} '
                                 CONTAINER_IDS=\$(docker ps -q --filter "name=my-vue-app-")
                                 if [ -n "\$CONTAINER_IDS" ]; then
                                     echo "Stopping and removing existing my-vue-app- containers..."
@@ -160,7 +161,7 @@ pipeline {
                         
                         // 새 컨테이너 실행
                         sh """
-                            ssh -i /home/jenkins/.ssh/id_rsa testdev@${SERVER_IP} '
+                            ssh -o StrictHostKeyChecking=no -i /home/jenkins/.ssh/id_rsa -p 2222 testdev@${SERVER_IP} '
                                 echo "Running new container from image ${imageTag}..."
                                 docker run -d --name ${IMAGE_NAME}-${BUILD_NUMBER} -p ${PORT}:3000 ${imageTag}
                             '
@@ -168,7 +169,7 @@ pipeline {
         
                         // /app 디렉토리 확인
                         sh """
-                            ssh -i /home/jenkins/.ssh/id_rsa testdev@${SERVER_IP} '
+                            ssh -o StrictHostKeyChecking=no -i /home/jenkins/.ssh/id_rsa -p 2222 testdev@${SERVER_IP} '
                                 echo "Checking /app directory..."
                                 docker exec ${IMAGE_NAME}-${BUILD_NUMBER} ls -l /app || { echo "/app 디렉토리가 없습니다."; exit 1; }
                             '
@@ -177,13 +178,13 @@ pipeline {
                         // 애플리케이션 상태 확인
                         echo '애플리케이션 상태 확인 중...'
                         sh """
-                            ssh testdev@${SERVER_IP} 'sleep 10 && curl -s http://localhost:${PORT} || exit 1'
+                            ssh -o StrictHostKeyChecking=no -i /home/jenkins/.ssh/id_rsa -p 2222 testdev@${SERVER_IP} 'sleep 10 && curl -s http://localhost:${PORT} || exit 1'
                         """
                     } catch (Exception e) {
                         // 배포 실패 시에도 실행 중인 컨테이너를 중지하고 삭제
                         echo "배포가 실패했습니다. 실행 중인 'my-vue-app-' 컨테이너를 중지하고 삭제합니다."
                         sh """
-                            ssh -i /home/jenkins/.ssh/id_rsa testdev@${SERVER_IP} '
+                            ssh -o StrictHostKeyChecking=no -i /home/jenkins/.ssh/id_rsa -p 2222 testdev@${SERVER_IP} '
                                 CONTAINER_IDS=\$(docker ps -q --filter "name=my-vue-app-")
                                 if [ -n "\$CONTAINER_IDS" ]; then
                                     echo "Stopping and removing existing my-vue-app- containers..."

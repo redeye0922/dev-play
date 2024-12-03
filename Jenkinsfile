@@ -136,7 +136,11 @@ pipeline {
                 script {
                     echo '서버에서 Docker 컨테이너 실행 중...'
                     def imageTag = "${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
-        
+                    // 호스트 키 제거 및 추가 
+                    sh """ ssh-keygen -f "/home/jenkins/.ssh/known_hosts" -R "${SERVER_IP}" 
+                           ssh-keyscan -p 2222 -H ${SERVER_IP} >> /home/jenkins/.ssh/known_hosts 
+                    """
+                    
                     // SSH 명령 실행
                     try {
                         // 기존 컨테이너 중지 및 삭제

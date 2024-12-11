@@ -23,7 +23,7 @@ pipeline {
                     
                     def major = (buildNumber / 1000).toInteger()
                     def minor = ((buildNumber / 100) % 10).toInteger()
-                    def patch = (buildNumber % 100).toInteger()
+                    def patch = (buildNumber % 100).toInteger() % 10
         
                     def newTag = "v${major}.${minor}.${patch}"
                     echo "새로운 버전: ${newTag}"
@@ -32,7 +32,7 @@ pipeline {
                 }
             }
         }
-        
+       
         stage('Checkout') {
             steps {
                 checkout scm

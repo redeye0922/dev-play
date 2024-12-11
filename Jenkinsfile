@@ -10,7 +10,7 @@ pipeline {
         SERVER_IP = "172.29.231.196"
         IMAGE_NAME = "my-vue-app"
         DOCKER_REGISTRY = "redeye0922"
-        INITIAL_TAG = "v1.0.0"
+        INITIAL_TAG = "v0.0.0"
         PORT = "3000"
     }
 

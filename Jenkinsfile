@@ -18,24 +18,29 @@ pipeline {
         stage('Set Version Tag') {
             steps {
                 script {
+                    echo "현재 빌드 번호: ${env.BUILD_NUMBER}"
                     def buildNumber = env.BUILD_NUMBER.toInteger()
                     def major = 1
                     def minor = 0
                     def patch = buildNumber
-
+        
+                    echo "초기 태그: v${major}.${minor}.${patch}"
+        
                     if (patch > 9) {
                         patch = 0
                         minor++
+                        echo "패치 번호 초기화, 마이너 증가: v${major}.${minor}.${patch}"
                     }
-
+        
                     if (minor > 9) {
                         minor = 0
                         major++
+                        echo "마이너 번호 초기화, 메이저 증가: v${major}.${minor}.${patch}"
                     }
-
+        
                     def newTag = "v${major}.${minor}.${patch}"
                     echo "새로운 버전: ${newTag}"
-
+        
                     env.DOCKER_IMAGE_TAG = newTag
                 }
             }

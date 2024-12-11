@@ -22,7 +22,7 @@ pipeline {
                     def buildNumber = env.BUILD_NUMBER.toInteger()
                     
                     def major = (buildNumber / 1000).toInteger()
-                    def minor = ((buildNumber / 100) % 10).toInteger()
+                    def minor = ((buildNumber / 100).toInteger() % 10).toInteger()
                     def patch = (buildNumber % 100).toInteger() % 10
         
                     def newTag = "v${major}.${minor}.${patch}"

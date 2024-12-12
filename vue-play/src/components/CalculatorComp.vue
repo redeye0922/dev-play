@@ -116,6 +116,15 @@ export default {
       this.isOperatorAdded = false;
       this.isStarted = false;
     },
+    // Handle Backspace and Delete keys
+    removeLast() {
+      if (this.equation.length > 1) {
+        this.equation = this.equation.slice(0, -1);
+      } else {
+        this.equation = "0";
+        this.isStarted = false;
+      }
+    },
     handleKeydown(event) {
       const key = event.key;
       if (!isNaN(key)) {
@@ -132,6 +141,10 @@ export default {
         this.clear();
       } else if (key === "±") {
         this.calculateToggle();
+      } else if (key === "Backspace") {
+        this.removeLast();
+      } else if (key === "Delete") {
+        this.clear();
       }
     },
   },

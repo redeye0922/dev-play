@@ -9,8 +9,8 @@
     <button style="grid-area: percent" @click="calculatePercentage">%</button>
     <button style="grid-area: add" @click="append('+')">+</button>
     <button style="grid-area: subtract" @click="append('-')">-</button>
-    <button style="grid-area: multiply" @click="append('*')">*</button>
-    <button style="grid-area: divide" @click="append('/')">/</button>
+    <button style="grid-area: multiply" @click="append('×')">×</button>
+    <button style="grid-area: divide" @click="append('÷')">÷</button>
     <button style="grid-area: equal" @click="calculate">=</button>
 
     <button style="grid-area: number-1" @click="append(1)">1</button>
@@ -39,9 +39,9 @@ export default {
     };
   },
   methods: {
-    // Check if the character is + / - / * / /
+    // Check if the character is + / - / × / ÷
     isOperator(character) {
-      return ["+", "-", "*", "/"].indexOf(character) > -1;
+      return ["+", "-", "×", "÷"].indexOf(character) > -1;
     },
     // When pressed Operators or Numbers
     append(character) {
@@ -116,54 +116,6 @@ export default {
       this.isOperatorAdded = false;
       this.isStarted = false;
     },
-    // Handle Backspace and Delete keys
-    removeLast() {
-      if (this.equation.length > 1) {
-        this.equation = this.equation.slice(0, -1);
-      } else {
-        this.equation = "0";
-        this.isStarted = false;
-      }
-    },
-    handleKeydown(event) {
-    const key = event.key;
-    switch (true) {
-      case !isNaN(key):
-        this.append(parseInt(key));
-        break;
-      case ["+", "-", "*", "/"].includes(key):
-        this.append(key);
-        break;
-      case key === "Enter" || key === "=":
-        this.calculate();
-        break;
-      case key === ".":
-        this.append(".");
-        break;
-      case key === "%":
-        this.calculatePercentage();
-        break;
-      case key === "Escape" || key === "c":
-        this.clear();
-        break;
-      case key === "±":
-        this.calculateToggle();
-        break;
-      case key === "Backspace":
-        this.removeLast();
-        break;
-      case key === "Delete":
-        this.clear();
-        break;
-      default:
-        break;
-    }
-  },
-  mounted() {
-    window.addEventListener("keydown", this.handleKeydown);
-  },
-  beforeDestroy() {
-    window.removeEventListener("keydown", this.handleKeydown);
   },
 };
 </script>

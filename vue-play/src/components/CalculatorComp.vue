@@ -126,27 +126,38 @@ export default {
       }
     },
     handleKeydown(event) {
-      const key = event.key;
-      if (!isNaN(key)) {
+    const key = event.key;
+    switch (true) {
+      case !isNaN(key):
         this.append(parseInt(key));
-      } else if (["+", "-", "*", "/"].includes(key)) {
+        break;
+      case ["+", "-", "*", "/"].includes(key):
         this.append(key);
-      } else if (key === "Enter" || key === "=") {
+        break;
+      case key === "Enter" || key === "=":
         this.calculate();
-      } else if (key === ".") {
+        break;
+      case key === ".":
         this.append(".");
-      } else if (key === "%") {
+        break;
+      case key === "%":
         this.calculatePercentage();
-      } else if (key === "Escape" || key === "c") {
+        break;
+      case key === "Escape" || key === "c":
         this.clear();
-      } else if (key === "±") {
+        break;
+      case key === "±":
         this.calculateToggle();
-      } else if (key === "Backspace") {
+        break;
+      case key === "Backspace":
         this.removeLast();
-      } else if (key === "Delete") {
+        break;
+      case key === "Delete":
         this.clear();
-      }
-    },
+        break;
+      default:
+        break;
+    }
   },
   mounted() {
     window.addEventListener("keydown", this.handleKeydown);

@@ -116,6 +116,30 @@ export default {
       this.isOperatorAdded = false;
       this.isStarted = false;
     },
+    handleKeydown(event) {
+      const key = event.key;
+      if (!isNaN(key)) {
+        this.append(parseInt(key));
+      } else if (["+", "-", "*", "/"].includes(key)) {
+        this.append(key.replace("*", "×").replace("/", "÷"));
+      } else if (key === "Enter" || key === "=") {
+        this.calculate();
+      } else if (key === ".") {
+        this.append(".");
+      } else if (key === "%") {
+        this.calculatePercentage();
+      } else if (key === "Escape" || key === "c") {
+        this.clear();
+      } else if (key === "±") {
+        this.calculateToggle();
+      }
+    },
+  },
+  mounted() {
+    window.addEventListener("keydown", this.handleKeydown);
+  },
+  beforeDestroy() {
+    window.removeEventListener("keydown", this.handleKeydown);
   },
 };
 </script>

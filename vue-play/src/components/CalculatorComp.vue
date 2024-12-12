@@ -9,8 +9,8 @@
     <button style="grid-area: percent" @click="calculatePercentage">%</button>
     <button style="grid-area: add" @click="append('+')">+</button>
     <button style="grid-area: subtract" @click="append('-')">-</button>
-    <button style="grid-area: multiply" @click="append('×')">×</button>
-    <button style="grid-area: divide" @click="append('÷')">÷</button>
+    <button style="grid-area: multiply" @click="append('*')">×</button>
+    <button style="grid-area: divide" @click="append('/')">÷</button>
     <button style="grid-area: equal" @click="calculate">=</button>
 
     <button style="grid-area: number-1" @click="append(1)">1</button>
@@ -39,13 +39,33 @@ export default {
     };
   },
   methods: {
-    // Check if the character is + / - / × / ÷
+    // Check if the character is an operator (+ / - / * / /)
     isOperator(character) {
-      return ["+", "-", "×", "÷"].indexOf(character) > -1;
+      return ["+", "-", "*", "/"].indexOf(character) > -1;
     },
-    // When pressed Operators or Numbers
+    // Handle keyboard input
+    handleKeydown(event) {
+      const key = event.key;
+      switch (key) {
+        case "Backspace":
+          this.clearLast();
+          break;
+        case "Delete":
+          this.clear();
+          break;
+        case "Enter":
+        case "=":
+          this.calculate();
+          break;
+        default:
+          if (this.isOperator(key) || (key >= "0" && key <= "9") || key === ".") {
+            this.append(key);
+          }
+          break;
+      }
+    },
+    // Append character when pressed Operators or Numbers
     append(character) {
-      // Start
       if (this.equation === "0" && !this.isOperator(character)) {
         if (character === ".") {
           this.equation += "" + character;
@@ -53,69 +73,75 @@ export default {
         } else {
           this.equation = "" + character;
         }
-
         this.isStarted = true;
         return;
       }
 
-      // If Number
       if (!this.isOperator(character)) {
         if (character === "." && this.isDecimalAdded) {
           return;
         }
-
         if (character === ".") {
           this.isDecimalAdded = true;
           this.isOperatorAdded = true;
         } else {
           this.isOperatorAdded = false;
         }
-
         this.equation += "" + character;
       }
 
-      // Added Operator
       if (this.isOperator(character) && !this.isOperatorAdded) {
         this.equation += "" + character;
         this.isDecimalAdded = false;
         this.isOperatorAdded = true;
       }
     },
-    // When pressed '='
+    // Calculate result when '=' pressed
     calculate() {
       let result = this.equation
-        .replace(new RegExp("×", "g"), "*")
-        .replace(new RegExp("÷", "g"), "/");
-
+        .replace(new RegExp("\\*", "g"), "*")
+        .replace(new RegExp("/", "g"), "/");
       this.equation = parseFloat(eval(result).toFixed(9)).toString();
       this.isDecimalAdded = false;
       this.isOperatorAdded = false;
     },
-    // When pressed '+/-'
+    // Toggle sign when '+/-' pressed
     calculateToggle() {
       if (this.isOperatorAdded || !this.isStarted) {
         return;
       }
-
       this.equation = this.equation + "* -1";
       this.calculate();
     },
-    // When pressed '%'
+    // Calculate percentage when '%' pressed
     calculatePercentage() {
       if (this.isOperatorAdded || !this.isStarted) {
         return;
       }
-
       this.equation = this.equation + "* 0.01";
       this.calculate();
     },
-    // When pressed 'AC'
+    // Clear display when 'AC' pressed
     clear() {
       this.equation = "0";
       this.isDecimalAdded = false;
       this.isOperatorAdded = false;
       this.isStarted = false;
     },
+    // Clear the last character
+    clearLast() {
+      if (this.equation.length > 1) {
+        this.equation = this.equation.slice(0, -1);
+      } else {
+        this.clear();
+      }
+    },
+  },
+  mounted() {
+    window.addEventListener("keydown", this.handleKeydown);
+  },
+  beforeDestroy() {
+    window.removeEventListener("keydown", this.handleKeydown);
   },
 };
 </script>

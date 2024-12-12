@@ -9,8 +9,8 @@
     <button style="grid-area: percent" @click="calculatePercentage">%</button>
     <button style="grid-area: add" @click="append('+')">+</button>
     <button style="grid-area: subtract" @click="append('-')">-</button>
-    <button style="grid-area: multiply" @click="append('×')">×</button>
-    <button style="grid-area: divide" @click="append('÷')">÷</button>
+    <button style="grid-area: multiply" @click="append('*')">*</button>
+    <button style="grid-area: divide" @click="append('/')">/</button>
     <button style="grid-area: equal" @click="calculate">=</button>
 
     <button style="grid-area: number-1" @click="append(1)">1</button>
@@ -39,9 +39,9 @@ export default {
     };
   },
   methods: {
-    // Check if the character is + / - / × / ÷
+    // Check if the character is + / - / * / /
     isOperator(character) {
-      return ["+", "-", "×", "÷"].indexOf(character) > -1;
+      return ["+", "-", "*", "/"].indexOf(character) > -1;
     },
     // When pressed Operators or Numbers
     append(character) {
@@ -121,7 +121,7 @@ export default {
       if (!isNaN(key)) {
         this.append(parseInt(key));
       } else if (["+", "-", "*", "/"].includes(key)) {
-        this.append(key.replace("*", "×").replace("/", "÷"));
+        this.append(key);
       } else if (key === "Enter" || key === "=") {
         this.calculate();
       } else if (key === ".") {

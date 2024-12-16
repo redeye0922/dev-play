@@ -169,6 +169,7 @@ export default {
             document.getElementById('level').textContent = `Level: ${level}`
           }
         }
+
         board = Array.from({ length: linesCleared }, () => Array(WIDTH).fill(0)).concat(newBoard)
       }
 
@@ -217,6 +218,7 @@ export default {
         gameOverFlag = false
         drawBoard()
       }
+
       this.tetrisKeydownHandler = event => {
         if (event.key === 'ArrowLeft') {
           moveBlock(0, -1)
@@ -233,7 +235,7 @@ export default {
       }
 
       const quitGame = () => {
-        this.cleanup() // 이벤트 리스너와 타이머를 먼저 정리합니다.
+        this.cleanup()
         this.$nextTick(() => {
           this.$destroy()
           this.$router.push('/minigames')

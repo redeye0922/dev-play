@@ -4,8 +4,9 @@
     <canvas id="game-canvas" width="800" height="600"></canvas>
     <div id="controls">
       <button id="restart-btn">Restart</button>
-      <button id="quit-btn">Quit</button>
+      <button id="quit-btn" @click="quitGame">Quit</button>
     </div>
+    <div id="score">Score: 0</div>
   </div>
 </template>
 
@@ -15,6 +16,11 @@ export default {
   data() {
     return {
       gameInitialized: false,
+      player: null,
+      bullets: [],
+      enemies: [],
+      score: 0,
+      gameOver: false
     }
   },
   mounted() {
@@ -46,27 +52,129 @@ export default {
       if (this.gameInitialized) return
 
       const canvas = document.getElementById('game-canvas')
-      const restartBtn = document.getElementById('restart-btn')
-      const quitBtn = document.getElementById('quit-btn')
+      const ctx = canvas.getContext('2d')
+      this.player = { x: 180, y: 500, width: 40, height: 50, color: 'blue' }
 
-      if (!canvas || !restartBtn || !quitBtn) {
-        console.error('Game elements not found')
-        return
+      const drawPlayer = () => {
+        ctx.fillStyle = this.player.color
+        ctx.fillRect(this.player.x, this.player.y, this.player.width, this.player.height)
       }
 
-      const ctx = canvas.getContext('2d')
+      const drawBullets = () => {
+        ctx.fillStyle = 'red'
+        for (const bullet of this.bullets) {
+          ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height)
+        }
+      }
 
-      // 간단한 배경 그리기 예제
-      ctx.fillStyle = 'black'
-      ctx.fillRect(0, 0, canvas.width, canvas.height)
+      const drawEnemies = () => {
+        ctx.fillStyle = 'green'
+        for (const enemy of this.enemies) {
+          ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height)
+        }
+      }
 
+      const updateGame = () => {
+        if (!this.gameOver) {
+          ctx.clearRect(0, 0, canvas.width, canvas.height)
+          drawPlayer()
+          drawBullets()
+          drawEnemies()
+
+          this.updateBullets()
+          this.updateEnemies()
+
+          requestAnimationFrame(updateGame)
+        }
+      }
+
+      const moveLeft = (event) => {
+        if (this.player.x > 0) {
+          this.player.x -= 20
+        }
+      }
+
+      const moveRight = (event) => {
+        if (this.player.x < canvas.width - this.player.width) {
+          this.player.x += 20
+        }
+      }
+
+      const shootBullet = (event) => {
+        const bullet = { x: this.player.x + 18, y: 480, width: 4, height: 20 }
+        this.bullets.push(bullet)
+      }
+
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'ArrowLeft') moveLeft(event)
+        if (event.key === 'ArrowRight') moveRight(event)
+        if (event.key === ' ') shootBullet(event)
+      })
+
+      this.createEnemy()
+      updateGame()
+
+      const restartBtn = document.getElementById('restart-btn')
       restartBtn.addEventListener('click', this.restartGame)
-      quitBtn.addEventListener('click', this.quitGame)
 
       this.gameInitialized = true
     },
+    updateBullets() {
+      for (const bullet of this.bullets) {
+        bullet.y -= 10
+        if (bullet.y < 0) {
+          this.bullets = this.bullets.filter(b => b !== bullet)
+        }
+      }
+    },
+    updateEnemies() {
+      for (const enemy of this.enemies) {
+        enemy.y += 5
+        if (enemy.y > 600) {
+          this.enemies = this.enemies.filter(e => e !== enemy)
+        }
+        for (const bullet of this.bullets) {
+          if (this.checkCollision(bullet, enemy)) {
+            this.bullets = this.bullets.filter(b => b !== bullet)
+            this.enemies = this.enemies.filter(e => e !== enemy)
+            this.score += 10
+            document.getElementById('score').textContent = `Score: ${this.score}`
+          }
+        }
+        if (this.checkCollision(this.player, enemy)) {
+          this.gameOver = true
+          const ctx = document.getElementById('game-canvas').getContext('2d')
+          ctx.fillStyle = 'red'
+          ctx.font = '30px Arial'
+          ctx.fillText('Game Over', 180, 300)
+          document.getElementById('restart-btn').disabled = false
+          return
+        }
+      }
+    },
+    checkCollision(obj1, obj2) {
+      return obj1.x < obj2.x + obj2.width &&
+             obj1.x + obj1.width > obj2.x &&
+             obj1.y < obj2.y + obj2.height &&
+             obj1.y + obj1.height > obj2.y
+    },
+    createEnemy() {
+      if (!this.gameOver) {
+        const x_position = Math.random() * (760)
+        const enemy = { x: x_position, y: 0, width: 40, height: 40 }
+        this.enemies.push(enemy)
+        setTimeout(this.createEnemy, 2000)
+      }
+    },
     restartGame() {
-      // 게임 재시작 로직을 여기에 추가합니다.
+      this.player = { x: 180, y: 500, width: 40, height: 50, color: 'blue' }
+      this.bullets = []
+      this.enemies = []
+      this.score = 0
+      this.gameOver = false
+      document.getElementById('score').textContent = 'Score: 0'
+      document.getElementById('restart-btn').disabled = true
+      this.initializeGame()
     },
     quitGame() {
       this.cleanup('quitGame')
@@ -76,7 +184,6 @@ export default {
       console.log(`Cleaning up from ${source}`)
       const restartBtn = document.getElementById('restart-btn')
       const quitBtn = document.getElementById('quit-btn')
-
       if (restartBtn) {
         restartBtn.removeEventListener('click', this.restartGame)
       }
@@ -121,3 +228,4 @@ button {
   font-size: 16px;
 }
 </style>
+

@@ -1,7 +1,3 @@
-정말 어렵고 답답한 상황이시군요. 이 오류는 컴포넌트가 파괴되기 전에 DOM 엘리먼트에 접근하거나 조작하려고 할 때 발생하는 것으로 보입니다. 아래 몇 가지 추가적인 방법을 시도해 보겠습니다:
-
-TetrisGame.vue수정된 코드
-vue
 <template>
   <div id="game-container">
     <h1>Tetris Game with Brython</h1>
@@ -22,6 +18,7 @@ export default {
     return {
       eventListenersAdded: false,
       moveTimerId: null,
+      tetrisKeydownHandler: null // Tetris 전용 키 다운 핸들러
     }
   },
   mounted() {
@@ -161,7 +158,7 @@ export default {
       }
 
       const clearLines = () => {
-        const newBoard = board.filter(row => row.some(cell => cell === 0))
+        const newBoard = board.filter(row => row.some(cell === 0))
         const linesCleared = HEIGHT - newBoard.length
         if (linesCleared > 0) {
           score += 100 * linesCleared
@@ -221,7 +218,7 @@ export default {
         drawBoard()
       }
 
-      this.handleKeydown = event => {
+      this.tetrisKeydownHandler = event => {
         if (event.key === 'ArrowLeft') {
           moveBlock(0, -1)
         } else if (event.key === 'ArrowRight') {
@@ -237,7 +234,6 @@ export default {
       }
 
       const quitGame = () => {
-        // Quit 버튼 클릭 시 이 부분에서 안전하게 정리
         this.cleanup()
         this.$nextTick(() => {
           this.$destroy()
@@ -245,7 +241,7 @@ export default {
         })
       }
 
-      document.addEventListener('keydown', this.handleKeydown)
+      document.addEventListener('keydown', this.tetrisKeydownHandler)
       this.eventListenersAdded = true
 
       document.getElementById('restart-btn').addEventListener('click', startGame)
@@ -255,7 +251,7 @@ export default {
     },
     cleanup() {
       if (this.eventListenersAdded) {
-        document.removeEventListener('keydown', this.handleKeydown)
+        document.removeEventListener('keydown', this.tetrisKeydownHandler)
         this.eventListenersAdded = false
       }
       if (this.moveTimerId !== null) {

@@ -94,7 +94,7 @@ export default {
         ctx.clearRect(0, 0, WIDTH * BLOCK_SIZE, HEIGHT * BLOCK_SIZE)
         ctx.strokeStyle = 'white'
         ctx.lineWidth = 4 // 경계선 두께를 두껍게 설정
-        ctx.strokeRect(0, 0, WIDTH * BLOCK_SIZE, HEIGHT * BLOCK SIZE)
+        ctx.strokeRect(0, 0, WIDTH * BLOCK_SIZE, HEIGHT * BLOCK_SIZE)
         board.forEach((row, y) => {
           row.forEach((cell, x) => {
             if (cell) {

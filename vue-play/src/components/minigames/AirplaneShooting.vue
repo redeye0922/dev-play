@@ -43,7 +43,7 @@ export default {
       document.head.appendChild(script)
     },
     initializeGame() {
-      if (this.gameInitialized) return;
+      if (this.gameInitialized) return
 
       const canvas = document.getElementById('game-canvas')
       const restartBtn = document.getElementById('restart-btn')
@@ -56,7 +56,9 @@ export default {
 
       const ctx = canvas.getContext('2d')
 
-      // 게임 초기화 로직을 여기에 추가합니다.
+      // 간단한 배경 그리기 예제
+      ctx.fillStyle = 'black'
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
 
       restartBtn.addEventListener('click', this.restartGame)
       quitBtn.addEventListener('click', this.quitGame)

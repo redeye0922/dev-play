@@ -17,7 +17,8 @@ export default {
   data() {
     return {
       eventListenersAdded: false,
-      moveTimerId: null
+      moveTimerId: null,
+      handleKeydown: null
     }
   },
   mounted() {
@@ -171,13 +172,6 @@ export default {
         board = Array.from({ length: linesCleared }, () => Array(WIDTH).fill(0)).concat(newBoard)
       }
 
-      this.scheduleNextMove = () => {
-        if (this.moveTimerId !== null) {
-          clearTimeout(this.moveTimerId)
-        }
-        this.moveTimerId = setTimeout(update, gameSpeed)
-      }
-
       const update = () => {
         if (gameOverFlag) return
         if (!moveBlock(1, 0)) {
@@ -191,6 +185,13 @@ export default {
           }
         }
         drawBoard()
+      }
+
+      this.scheduleNextMove = () => {
+        if (this.moveTimerId !== null) {
+          clearTimeout(this.moveTimerId)
+        }
+        this.moveTimerId = setTimeout(update, gameSpeed)
       }
 
       const checkGameOver = () => {

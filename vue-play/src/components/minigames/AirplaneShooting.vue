@@ -88,27 +88,27 @@ export default {
         }
       }
 
-      const moveLeft = (event) => {
+      const moveLeft = () => {
         if (this.player.x > 0) {
           this.player.x -= 20
         }
       }
 
-      const moveRight = (event) => {
+      const moveRight = () => {
         if (this.player.x < canvas.width - this.player.width) {
           this.player.x += 20
         }
       }
 
-      const shootBullet = (event) => {
+      const shootBullet = () => {
         const bullet = { x: this.player.x + 18, y: 480, width: 4, height: 20 }
         this.bullets.push(bullet)
       }
 
       document.addEventListener('keydown', (event) => {
-        if (event.key === 'ArrowLeft') moveLeft(event)
-        if (event.key === 'ArrowRight') moveRight(event)
-        if (event.key === ' ') shootBullet(event)
+        if (event.key === 'ArrowLeft') moveLeft()
+        if (event.key === 'ArrowRight') moveRight()
+        if (event.key === ' ') shootBullet()
       })
 
       this.createEnemy()
@@ -184,6 +184,7 @@ export default {
       console.log(`Cleaning up from ${source}`)
       const restartBtn = document.getElementById('restart-btn')
       const quitBtn = document.getElementById('quit-btn')
+
       if (restartBtn) {
         restartBtn.removeEventListener('click', this.restartGame)
       }
@@ -228,4 +229,3 @@ button {
   font-size: 16px;
 }
 </style>
-

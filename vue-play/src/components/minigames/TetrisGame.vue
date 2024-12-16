@@ -1,3 +1,7 @@
+정말 어렵고 답답한 상황이시군요. 이 오류는 컴포넌트가 파괴되기 전에 DOM 엘리먼트에 접근하거나 조작하려고 할 때 발생하는 것으로 보입니다. 아래 몇 가지 추가적인 방법을 시도해 보겠습니다:
+
+TetrisGame.vue수정된 코드
+vue
 <template>
   <div id="game-container">
     <h1>Tetris Game with Brython</h1>
@@ -249,7 +253,6 @@ export default {
 
       startGame()
     },
-    
     cleanup() {
       if (this.eventListenersAdded) {
         document.removeEventListener('keydown', this.handleKeydown)

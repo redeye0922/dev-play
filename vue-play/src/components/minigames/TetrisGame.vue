@@ -298,9 +298,9 @@ export default {
       const brythonElems = document.querySelectorAll('[type="text/python"]');
       brythonElems.forEach(elem => elem.remove());
 
-      // Brython 파이썬 런타임 종료
-      if (window.Brython && window.Brython.python_to_js) {
-        window.Brython.python_to_js.py_end();
+      // Brython 객체 제거
+      if (typeof window.__BRYTHON__ !== 'undefined') {
+        delete window.__BRYTHON__;
       }
     }
   }

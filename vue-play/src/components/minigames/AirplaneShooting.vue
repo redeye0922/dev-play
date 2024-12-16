@@ -1,20 +1,30 @@
 <template>
   <div id="game-container">
-    <h1>Airplane Shooting Game with Brython</h1>
-    <canvas id="game-canvas" width="400" height="600"></canvas>
+    <h1>Airplane Shooting Game</h1>
+    <canvas id="game-canvas" width="800" height="600"></canvas>
     <div id="controls">
-      <button @click="restartGame">다시하기</button>
-      <button @click="quitGame">종료하기</button>
+      <button id="restart-btn">Restart</button>
+      <button id="quit-btn">Quit</button>
     </div>
-    <div id="score">Score: 0</div>
   </div>
 </template>
 
 <script>
 export default {
   name: 'AirplaneShooting',
+  data() {
+    return {
+      gameInitialized: false,
+    }
+  },
   mounted() {
     this.loadBrython()
+  },
+  beforeDestroy() {
+    this.cleanup('beforeDestroy')
+  },
+  destroyed() {
+    this.cleanup('destroyed')
   },
   methods: {
     loadBrython() {
@@ -24,118 +34,70 @@ export default {
         const stdlib = document.createElement('script')
         stdlib.src = 'https://cdn.jsdelivr.net/npm/brython@3.9.5/brython_stdlib.js'
         stdlib.onload = () => {
-          this.initializeGame()
+          this.$nextTick(() => {
+            this.initializeGame()
+          })
         }
         document.head.appendChild(stdlib)
       }
       document.head.appendChild(script)
     },
     initializeGame() {
+      if (this.gameInitialized) return;
+
       const canvas = document.getElementById('game-canvas')
+      const restartBtn = document.getElementById('restart-btn')
+      const quitBtn = document.getElementById('quit-btn')
+
+      if (!canvas || !restartBtn || !quitBtn) {
+        console.error('Game elements not found')
+        return
+      }
+
       const ctx = canvas.getContext('2d')
 
-      let playerX = 180
-      const playerY = 500
-      const bullets = []
-      const enemies = []
-      let score = 0
-      let gameOver = false
+      // 게임 초기화 로직을 여기에 추가합니다.
 
-      const moveLeft = () => {
-        playerX = Math.max(playerX - 20, 0)
+      restartBtn.addEventListener('click', this.restartGame)
+      quitBtn.addEventListener('click', this.quitGame)
+
+      this.gameInitialized = true
+    },
+    restartGame() {
+      // 게임 재시작 로직을 여기에 추가합니다.
+    },
+    quitGame() {
+      this.cleanup('quitGame')
+      this.$router.push('/minigames')
+    },
+    cleanup(source) {
+      console.log(`Cleaning up from ${source}`)
+      const restartBtn = document.getElementById('restart-btn')
+      const quitBtn = document.getElementById('quit-btn')
+
+      if (restartBtn) {
+        restartBtn.removeEventListener('click', this.restartGame)
+      }
+      if (quitBtn) {
+        quitBtn.removeEventListener('click', this.quitGame)
       }
 
-      const moveRight = () => {
-        playerX = Math.min(playerX + 20, 360)
+      // Brython 관련 리소스를 정리합니다.
+      const brythonScripts = document.querySelectorAll('script[src*="brython"]')
+      brythonScripts.forEach(script => script.remove())
+      const brythonStdlibScripts = document.querySelectorAll('script[src*="brython_stdlib"]')
+      brythonStdlibScripts.forEach(script => script.remove())
+
+      // Brython 관련 DOM 요소도 제거합니다.
+      const brythonElems = document.querySelectorAll('[type="text/python"]')
+      brythonElems.forEach(elem => elem.remove())
+
+      // Brython 객체를 제거합니다.
+      if (typeof window.__BRYTHON__ !== 'undefined') {
+        window.__BRYTHON__.$options = null
+        window.__BRYTHON__.stdlib_path = null
+        window.__BRYTHON__.py_namespaces = null
       }
-
-      const shootBullet = () => {
-        bullets.push([playerX + 18, 480])
-      }
-
-      const createEnemy = () => {
-        if (!gameOver) {
-          const xPosition = Math.floor(Math.random() * 361)
-          enemies.push([xPosition, 0])
-          setTimeout(createEnemy, 2000)
-        }
-      }
-
-      const update = () => {
-        ctx.clearRect(0, 0, 400, 600)
-        ctx.fillStyle = 'blue'
-        ctx.fillRect(playerX, playerY, 40, 50)
-
-        bullets.forEach((bullet, index) => {
-          bullet[1] -= 10
-          ctx.fillStyle = 'red'
-          ctx.fillRect(bullet[0], bullet[1], 4, 20)
-          if (bullet[1] < 0) {
-            bullets.splice(index, 1)
-          }
-        })
-
-        enemies.forEach((enemy, index) => {
-          enemy[1] += 5
-          ctx.fillStyle = 'green'
-          ctx.fillRect(enemy[0], enemy[1], 40, 40)
-          if (enemy[1] > 600) {
-            enemies.splice(index, 1)
-          }
-
-          bullets.forEach((bullet, bIndex) => {
-            if (bullet[0] >= enemy[0] && bullet[0] <= enemy[0] + 40 && bullet[1] <= enemy[1] + 40) {
-              bullets.splice(bIndex, 1)
-              enemies.splice(index, 1)
-              score += 10
-              document.getElementById('score').textContent = `Score: ${score}`
-            }
-          })
-
-          if (playerX >= enemy[0] && playerX <= enemy[0] + 40 && playerY <= enemy[1] + 40) {
-            gameOver = true
-            ctx.fillStyle = 'red'
-            ctx.font = '30px Arial'
-            ctx.fillText('Game Over', 120, 300)
-            return
-          }
-        })
-
-        if (!gameOver) {
-          setTimeout(update, 50)
-        }
-      }
-
-      document.addEventListener('keydown', event => {
-        if (event.key === 'ArrowLeft') {
-          moveLeft()
-        } else if (event.key === 'ArrowRight') {
-          moveRight()
-        } else if (event.key === ' ') {
-          shootBullet()
-        }
-      })
-
-      const restartGame = () => {
-        playerX = 180
-        score = 0
-        document.getElementById('score').textContent = `Score: ${score}`
-        bullets.length = 0
-        enemies.length = 0
-        gameOver = false
-        update()
-        createEnemy()
-      }
-
-      const quitGame = () => {
-        alert('게임을 종료합니다.')
-      }
-
-      document.getElementById('restart-btn').addEventListener('click', restartGame)
-      document.getElementById('quit-btn').addEventListener('click', quitGame)
-
-      createEnemy()
-      update()
     }
   }
 }
@@ -150,7 +112,7 @@ export default {
 #controls {
   display: flex;
   justify-content: space-around;
-  width: 400px;
+  width: 300px;
   margin: 10px 0;
 }
 button {

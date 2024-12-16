@@ -174,6 +174,7 @@ body {
     8px 8px 16px -10px rgba(0, 0, 0, 0.15);
   padding: 24px;
   border-radius: 20px;
+  box-sizing: border-box; /* 추가: 전체 컴포넌트를 화면에 맞게 조정 */
 }
 
 .calculator-app button {

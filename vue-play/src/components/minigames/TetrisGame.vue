@@ -212,6 +212,7 @@ export default {
         console.log('Scheduling next move');
         if (this.moveTimerId !== null) {
           clearTimeout(this.moveTimerId);
+          this.moveTimerId = null;  // 명확히 초기화
         }
         this.moveTimerId = setTimeout(update, gameSpeed);
       };
@@ -221,7 +222,7 @@ export default {
         return board[0].some(cell => cell === 1);
       };
 
-           const gameOver = () => {
+      const gameOver = () => {
         console.log('Game over');
         gameOverFlag = true;
         alert('게임 종료! 다시 시작하시겠습니까?', confirmAction => {
@@ -230,7 +231,6 @@ export default {
           }
         });
       };
-
       const startGame = () => {
         console.log('Starting new game');
         blockPosition = [0, 3];

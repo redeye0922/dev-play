@@ -14,6 +14,11 @@
 <script>
 export default {
   name: 'TetrisGame',
+  data() {
+    return {
+      eventListenersAdded: false
+    }
+  },
   mounted() {
     this.loadBrython()
   },
@@ -225,7 +230,9 @@ export default {
       }
 
       const quitGame = () => {
-        document.removeEventListener('keydown', handleKeydown)
+        if (this.eventListenersAdded) {
+          document.removeEventListener('keydown', handleKeydown)
+        }
         if (moveTimerId !== null) {
           clearTimeout(moveTimerId)
         }
@@ -233,6 +240,8 @@ export default {
       }
 
       document.addEventListener('keydown', handleKeydown)
+      this.eventListenersAdded = true
+
       document.getElementById('restart-btn').addEventListener('click', startGame)
       document.getElementById('quit-btn').addEventListener('click', quitGame)
 

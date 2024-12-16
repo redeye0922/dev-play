@@ -29,6 +29,10 @@ export default {
     console.log('TetrisGame beforeDestroy');
     this.cleanup('beforeDestroy');
   },
+  destroyed() {
+    console.log('TetrisGame destroyed');
+    this.cleanup('destroyed');
+  },
   beforeRouteLeave (to, from, next) {
     console.log('TetrisGame beforeRouteLeave');
     this.cleanup('beforeRouteLeave');
@@ -231,6 +235,7 @@ export default {
           }
         });
       };
+
       const startGame = () => {
         console.log('Starting new game');
         blockPosition = [0, 3];

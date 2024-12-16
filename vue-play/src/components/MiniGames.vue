@@ -1,19 +1,27 @@
 <template>
-  <div id="minigames">
+  <div>
     <h1>Mini Games</h1>
-    <ul>
-      <li><router-link to="/minigames/airplane-shooting">Airplane Shooting</router-link></li>
-      <li><router-link to="/minigames/avoid-obstacles">Avoid Obstacles</router-link></li>
-      <li><router-link to="/minigames/brick-breaker">Brick Breaker</router-link></li>
-      <li><router-link to="/minigames/gomoku">Gomoku</router-link></li>
-      <li><router-link to="/minigames/tetris-game">Tetris</router-link></li>
-    </ul>
+    <router-link to="/minigames/airplane-shooting">Airplane Shooting</router-link>
+    <router-link to="/minigames/avoid-obstacles">Avoid Obstacles</router-link>
+    <router-link to="/minigames/brick-breaker">Brick Breaker</router-link>
+    <router-link to="/minigames/gomoku">Gomoku</router-link>
+    <router-link to="/minigames/tetris-game">Tetris Game</router-link>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'MiniGames'
+  name: 'MiniGames',
+  beforeRouteLeave (to, from, next) {
+    // 현재 활성화된 게임 컴포넌트를 찾아 종료합니다.
+    if (this.$route.name.startsWith('minigames/')) {
+      const activeGameComponent = this.$children.find(comp => comp.$options.name === this.$route.name);
+      if (activeGameComponent && activeGameComponent.cleanup) {
+        activeGameComponent.cleanup();
+      }
+    }
+    next();
+  }
 }
 </script>
 

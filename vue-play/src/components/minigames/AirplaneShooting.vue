@@ -67,7 +67,7 @@ export default {
         }
       }
 
-            const drawEnemies = () => {
+      const drawEnemies = () => {
         ctx.fillStyle = 'green'
         for (const enemy of this.enemies) {
           ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height)
@@ -82,7 +82,7 @@ export default {
           drawEnemies()
 
           this.updateBullets()
-          this.updateEnemies()
+          this.updateEnemies(ctx)
 
           requestAnimationFrame(updateGame)
         }
@@ -127,7 +127,7 @@ export default {
         }
       }
     },
-    updateEnemies() {
+    updateEnemies(ctx) {
       for (const enemy of this.enemies) {
         enemy.y += 5
         if (enemy.y > 600) {
@@ -162,7 +162,7 @@ export default {
         const x_position = Math.random() * 360
         const enemy = { x: x_position, y: 0, width: 40, height: 40 }
         this.enemies.push(enemy)
-        setTimeout(this.createEnemy, 2000)
+        setTimeout(() => { this.createEnemy() }, 2000)
       }
     },
     restartGame() {

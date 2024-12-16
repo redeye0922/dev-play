@@ -31,8 +31,6 @@ export default {
   },
   destroyed() {
     console.log('TetrisGame destroyed');
-    // 여기서 Vue 인스턴스를 완전히 제거
-    this.$el.innerHTML = '';
   },
   beforeRouteLeave (to, from, next) {
     console.log('TetrisGame beforeRouteLeave');
@@ -236,6 +234,7 @@ export default {
           }
         });
       };
+
       const startGame = () => {
         console.log('Starting new game');
         blockPosition = [0, 3];
@@ -288,6 +287,11 @@ export default {
         clearTimeout(this.moveTimerId);
         this.moveTimerId = null;
       }
+      // Brython 관련 리소스를 정리합니다.
+      const brythonScripts = document.querySelectorAll('script[src*="brython"]');
+      brythonScripts.forEach(script => script.remove());
+      const brythonStdlibScripts = document.querySelectorAll('script[src*="brython_stdlib"]');
+      brythonStdlibScripts.forEach(script => script.remove());
     }
   }
 }
@@ -309,3 +313,4 @@ button {
   font-size: 16px;
 }
 </style>
+      

@@ -146,7 +146,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 body {
   display: flex;
   justify-content: center;
@@ -210,3 +210,4 @@ body {
   color: #666;
 }
 </style>
+

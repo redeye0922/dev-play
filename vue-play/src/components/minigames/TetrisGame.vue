@@ -18,13 +18,11 @@ export default {
     return {
       eventListenersAdded: false,
       moveTimerId: null,
-      handleKeydown: null
+      // `handleKeydown` 정의된 값을 제거
     }
   },
   mounted() {
     this.loadBrython()
-    // handleKeydown 바인딩 
-    this.handleKeydown = this.handleKeydown.bind(this)
   },
   beforeDestroy() {
     this.cleanup()
@@ -160,7 +158,7 @@ export default {
       }
 
       const clearLines = () => {
-        const newBoard = board.filter(row => row.some(cell => cell === 0))
+        const newBoard = board.filter(row => row.some(cell === 0))
         const linesCleared = HEIGHT - newBoard.length
         if (linesCleared > 0) {
           score += 100 * linesCleared
@@ -219,11 +217,11 @@ export default {
         gameOverFlag = false
         drawBoard()
       }
-      
-      const handleKeydown = (event) => {
+
+      this.handleKeydown = event => {
         if (event.key === 'ArrowLeft') {
           moveBlock(0, -1)
-        } else if (event.key === 'ArrowRight') {
+        } else if (event.key === 'ArrowRight') {          
           moveBlock(0, 1)
         } else if (event.key === 'ArrowDown') {
           moveBlock(1, 0)
@@ -237,10 +235,13 @@ export default {
 
       const quitGame = () => {
         this.cleanup()
+        this.$destroy()
         this.$router.push('/minigames')
       }
 
       document.addEventListener('keydown', this.handleKeydown)
+      this.eventListenersAdded = true
+
       document.getElementById('restart-btn').addEventListener('click', startGame)
       document.getElementById('quit-btn').addEventListener('click', quitGame)
 
@@ -276,3 +277,4 @@ button {
   font-size: 16px;
 }
 </style>
+

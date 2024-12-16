@@ -54,6 +54,7 @@ const router = new VueRouter({
       component: BoardCreate,
     },
     
+    { path: '/minigames', name: 'MiniGames', component: MiniGames },
     { path: '/minigames/airplane-shooting', name: 'AirplaneShooting', component: AirplaneShooting }, 
     { path: '/minigames/avoid-obstacles', name: 'AvoidObstacles', component: AvoidObstacles }, 
     { path: '/minigames/brick-breaker', name: 'BrickBreaker', component: BrickBreaker }, 

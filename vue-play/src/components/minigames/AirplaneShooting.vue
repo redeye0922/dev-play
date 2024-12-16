@@ -1,7 +1,7 @@
 <template>
   <div id="game-container">
     <h1>Airplane Shooting Game</h1>
-    <canvas id="game-canvas" width="400" height="600"></canvas> <!-- 캔버스 크기를 400x600으로 조정 -->
+    <canvas id="game-canvas" width="800" height="600"></canvas>
     <div id="controls">
       <button id="restart-btn">Restart</button>
       <button id="quit-btn" @click="quitGame">Quit</button>
@@ -146,7 +146,7 @@ export default {
           const ctx = document.getElementById('game-canvas').getContext('2d')
           ctx.fillStyle = 'red'
           ctx.font = '30px Arial'
-          ctx.fillText('Game Over', 80, 300) <!-- 텍스트 위치 조정 -->
+          ctx.fillText('Game Over', 180, 300)
           document.getElementById('restart-btn').disabled = false
           return
         }
@@ -160,7 +160,7 @@ export default {
     },
     createEnemy() {
       if (!this.gameOver) {
-        const x_position = Math.random() * (360)
+        const x_position = Math.random() * 760
         const enemy = { x: x_position, y: 0, width: 40, height: 40 }
         this.enemies.push(enemy)
         setTimeout(this.createEnemy, 2000)

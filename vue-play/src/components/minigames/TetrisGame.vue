@@ -181,7 +181,7 @@ export default {
 
       const clearLines = () => {
         console.log('Clearing lines');
-        const newBoard = board.filter(row => row.some(cell => cell === 0));
+        const newBoard = board.filter(row => row.some(cell === 0));
         const linesCleared = HEIGHT - newBoard.length;
         if (linesCleared > 0) {
           score += 100 * linesCleared;
@@ -225,7 +225,7 @@ export default {
         return board[0].some(cell => cell === 1);
       };
 
-          const gameOver = () => {
+      const gameOver = () => {
         console.log('Game over');
         gameOverFlag = true;
         alert('게임 종료! 다시 시작하시겠습니까?', confirmAction => {
@@ -322,4 +322,3 @@ button {
   font-size: 16px;
 }
 </style>
-  

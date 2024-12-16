@@ -158,7 +158,7 @@ export default {
       }
 
       const clearLines = () => {
-        const newBoard = board.filter(row => row.some(cell === 0))
+        const newBoard = board.filter(row => row.some(cell => cell === 0))
         const linesCleared = HEIGHT - newBoard.length
         if (linesCleared > 0) {
           score += 100 * linesCleared
@@ -249,6 +249,7 @@ export default {
 
       startGame()
     },
+    
     cleanup() {
       if (this.eventListenersAdded) {
         document.removeEventListener('keydown', this.tetrisKeydownHandler)

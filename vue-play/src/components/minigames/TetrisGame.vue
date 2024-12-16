@@ -239,10 +239,7 @@ export default {
 
       const quitGame = () => {
         this.cleanup()
-        setTimeout(() => {
-          this.$destroy()
-          this.$router.push('/minigames')
-        }, 100)
+        this.$router.push('/minigames')
       }
 
       document.addEventListener('keydown', this.tetrisKeydownHandler)

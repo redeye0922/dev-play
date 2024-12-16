@@ -91,7 +91,7 @@ export default {
         // Draw border
         ctx.strokeStyle = 'white'
         ctx.lineWidth = 2
-        ctx.strokeRect(1, 1, canvas.width - 2, canvas.height - 2) // 경계선 확실하게 설정
+        ctx.strokeRect(1, 1, canvas.width - 2, canvas.height - 2)
 
         // Move ball
         ball_x += ball_dx
@@ -120,13 +120,7 @@ export default {
         // Check for brick collisions
         for (const row of bricks) {
           for (const brick of row) {
-            if (
-              brick &&
-              brick[0] <= ball_x &&
-              ball_x <= brick[2] &&
-              brick[1] <= ball_y - ball_radius &&
-              ball_y - ball_radius <= brick[3]
-            ) {
+            if (brick && brick[0] <= ball_x && ball_x <= brick[2] && brick[1] <= ball_y - ball_radius && ball_y - ball_radius <= brick[3]) {
               row[row.indexOf(brick)] = null
               ball_dy *= -1
               score += 10

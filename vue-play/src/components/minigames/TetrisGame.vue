@@ -244,7 +244,6 @@ export default {
 
       document.addEventListener('keydown', this.tetrisKeydownHandler)
       this.eventListenersAdded = true
-
       document.getElementById('restart-btn').addEventListener('click', startGame)
       document.getElementById('quit-btn').addEventListener('click', quitGame)
 
@@ -280,3 +279,4 @@ button {
   font-size: 16px;
 }
 </style>
+      

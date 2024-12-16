@@ -297,10 +297,12 @@ export default {
       // Brython 관련 DOM 요소도 제거합니다.
       const brythonElems = document.querySelectorAll('[type="text/python"]');
       brythonElems.forEach(elem => elem.remove());
-
-      // Brython 객체를 null로 설정
+      
+      // Brython 객체를 제거합니다.
       if (typeof window.__BRYTHON__ !== 'undefined') {
-        window.__BRYTHON__ = null;
+        window.__BRYTHON__.$options = null;
+        window.__BRYTHON__.stdlib_path = null;
+        window.__BRYTHON__.py_namespaces = null;
       }
     }
   }

@@ -142,8 +142,9 @@ export default {
               if (board[newY][newX]) {
                 return false;
               }
+              return true;  // cell이 true일 때만
             }
-            return true;
+            return true;  // cell이 false일 때
           });
         });
       };
@@ -181,7 +182,7 @@ export default {
 
       const clearLines = () => {
         console.log('Clearing lines');
-        const newBoard = board.filter(row => row.some(cell === 0));
+        const newBoard = board.filter(row => row.some(cell => cell === 0));
         const linesCleared = HEIGHT - newBoard.length;
         if (linesCleared > 0) {
           score += 100 * linesCleared;
@@ -298,8 +299,8 @@ export default {
       brythonElems.forEach(elem => elem.remove());
 
       // Brython 파이썬 런타임 종료
-      if (typeof __BRYTHON__ !== 'undefined') {
-        __BRYTHON__.py_end();
+      if (typeof window.__BRYTHON__ !== 'undefined') {
+        window.__BRYTHON__.py_end();
       }
     }
   }

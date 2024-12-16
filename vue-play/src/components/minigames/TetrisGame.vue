@@ -225,7 +225,7 @@ export default {
         return board[0].some(cell => cell === 1);
       };
 
-      const gameOver = () => {
+          const gameOver = () => {
         console.log('Game over');
         gameOverFlag = true;
         alert('게임 종료! 다시 시작하시겠습니까?', confirmAction => {
@@ -296,6 +296,11 @@ export default {
       // Brython 관련 DOM 요소도 제거합니다.
       const brythonElems = document.querySelectorAll('[type="text/python"]');
       brythonElems.forEach(elem => elem.remove());
+
+      // Brython 파이썬 런타임 종료
+      if (typeof __BRYTHON__ !== 'undefined') {
+        __BRYTHON__.py_end();
+      }
     }
   }
 }
@@ -317,3 +322,4 @@ button {
   font-size: 16px;
 }
 </style>
+  

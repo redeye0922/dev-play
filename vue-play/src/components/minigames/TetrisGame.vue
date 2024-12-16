@@ -83,6 +83,9 @@ export default {
 
       const drawBoard = () => {
         ctx.clearRect(0, 0, WIDTH * BLOCK_SIZE, HEIGHT * BLOCK_SIZE)
+        ctx.strokeStyle = 'white'
+        ctx.lineWidth = 2
+        ctx.strokeRect(0, 0, WIDTH * BLOCK_SIZE, HEIGHT * BLOCK_SIZE)
         board.forEach((row, y) => {
           row.forEach((cell, x) => {
             if (cell) {

@@ -1,7 +1,7 @@
 <template>
   <div id="game-container">
     <h1>Airplane Shooting Game</h1>
-    <canvas id="game-canvas" width="800" height="600"></canvas>
+    <canvas id="game-canvas" width="400" height="600"></canvas>
     <div id="controls">
       <button id="restart-btn">Restart</button>
       <button id="quit-btn" @click="quitGame">Quit</button>
@@ -67,7 +67,7 @@ export default {
         }
       }
 
-      const drawEnemies = () => {
+            const drawEnemies = () => {
         ctx.fillStyle = 'green'
         for (const enemy of this.enemies) {
           ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height)
@@ -143,7 +143,6 @@ export default {
         }
         if (this.checkCollision(this.player, enemy)) {
           this.gameOver = true
-          const ctx = document.getElementById('game-canvas').getContext('2d')
           ctx.fillStyle = 'red'
           ctx.font = '30px Arial'
           ctx.fillText('Game Over', 180, 300)
@@ -160,7 +159,7 @@ export default {
     },
     createEnemy() {
       if (!this.gameOver) {
-        const x_position = Math.random() * 760
+        const x_position = Math.random() * 360
         const enemy = { x: x_position, y: 0, width: 40, height: 40 }
         this.enemies.push(enemy)
         setTimeout(this.createEnemy, 2000)

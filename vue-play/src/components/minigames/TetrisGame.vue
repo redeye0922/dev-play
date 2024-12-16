@@ -16,11 +16,15 @@ export default {
   name: 'TetrisGame',
   data() {
     return {
-      eventListenersAdded: false
+      eventListenersAdded: false,
+      moveTimerId: null
     }
   },
   mounted() {
     this.loadBrython()
+  },
+  beforeDestroy() {
+    this.cleanup()
   },
   methods: {
     loadBrython() {
@@ -52,7 +56,6 @@ export default {
       let score = 0
       let level = 1
       let gameOverFlag = false
-      let moveTimerId = null
 
       const speedByLevel = {1: 1000, 2: 900, 3: 800, 4: 700, 5: 600, 6: 500, 7: 400, 8: 300, 9: 200, 10: 100}
       let gameSpeed = speedByLevel[level]
@@ -103,7 +106,7 @@ export default {
           drawBlock(currentBlock, blockPosition)
         }
         if (!gameOverFlag) {
-          scheduleNextMove()
+          this.scheduleNextMove()
         }
       }
 
@@ -140,7 +143,7 @@ export default {
         clearLines()
         createBlock()
         blockPosition = [0, 3]
-        scheduleNextMove()
+        this.scheduleNextMove()
       }
 
       const mergeBlock = () => {
@@ -168,11 +171,11 @@ export default {
         board = Array.from({ length: linesCleared }, () => Array(WIDTH).fill(0)).concat(newBoard)
       }
 
-      const scheduleNextMove = () => {
-        if (moveTimerId !== null) {
-          clearTimeout(moveTimerId)
+      this.scheduleNextMove = () => {
+        if (this.moveTimerId !== null) {
+          clearTimeout(this.moveTimerId)
         }
-        moveTimerId = setTimeout(update, gameSpeed)
+        this.moveTimerId = setTimeout(update, gameSpeed)
       }
 
       const update = () => {
@@ -214,7 +217,7 @@ export default {
         drawBoard()
       }
 
-      const handleKeydown = event => {
+      this.handleKeydown = event => {
         if (event.key === 'ArrowLeft') {
           moveBlock(0, -1)
         } else if (event.key === 'ArrowRight') {
@@ -230,22 +233,25 @@ export default {
       }
 
       const quitGame = () => {
-        if (this.eventListenersAdded) {
-          document.removeEventListener('keydown', handleKeydown)
-        }
-        if (moveTimerId !== null) {
-          clearTimeout(moveTimerId)
-        }
+        this.cleanup()
         this.$router.push('/minigames')
       }
 
-      document.addEventListener('keydown', handleKeydown)
+      document.addEventListener('keydown', this.handleKeydown)
       this.eventListenersAdded = true
 
       document.getElementById('restart-btn').addEventListener('click', startGame)
       document.getElementById('quit-btn').addEventListener('click', quitGame)
 
       startGame()
+    },
+    cleanup() {
+      if (this.eventListenersAdded) {
+        document.removeEventListener('keydown', this.handleKeydown)
+      }
+      if (this.moveTimerId !== null) {
+        clearTimeout(this.moveTimerId)
+      }
     }
   }
 }

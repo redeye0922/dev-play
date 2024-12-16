@@ -5,11 +5,11 @@ import BoardDetail from "@/components/board/BoardDetail";
 import BoardCreate from "@/components/board/BoardCreate";
 
 import MiniGames from '@/components/MiniGames.vue' 
-import BrickBreaker from '@/components/minigames/BrickBreaker.vue' 
-import Tetris from '@/components/minigames/TetrisGame.vue' 
-import Gomoku from '@/components/minigames/Gomoku.vue' 
+import AirplaneShooting from '@/components/minigames/AirplaneShooting.vue' 
 import AvoidObstacles from '@/components/minigames/AvoidObstacles.vue' 
-import AirplaneShooting from '@/components/minigames/AirplaneShooting.vue'
+import BrickBreaker from '@/components/minigames/BrickBreaker.vue' 
+import Gomoku from '@/components/minigames/Gomoku.vue' 
+import TetrisGame from '@/components/minigames/TetrisGame.vue'
 
 import MainPage from "@/components/MainPage";
 import LoginPage from "@/components/login/LoginPage";
@@ -53,12 +53,13 @@ const router = new VueRouter({
       name: "BoardCreate",
       component: BoardCreate,
     },
-    { path: '/minigames', name: 'MiniGames', component: MiniGames },
-    { path: '/minigames/brick-breaker', name: 'BrickBreaker', component: BrickBreaker }, 
-    { path: '/minigames/tetris', name: 'Tetris', component: TetrisGame }, 
-    { path: '/minigames/gomoku', name: 'Gomoku', component: Gomoku }, 
+    
+    { path: '/minigames/airplane-shooting', name: 'AirplaneShooting', component: AirplaneShooting }, 
     { path: '/minigames/avoid-obstacles', name: 'AvoidObstacles', component: AvoidObstacles }, 
-    { path: '/minigames/airplane-shooting', name: 'AirplaneShooting', component: AirplaneShooting },
+    { path: '/minigames/brick-breaker', name: 'BrickBreaker', component: BrickBreaker }, 
+    { path: '/minigames/gomoku', name: 'Gomoku', component: Gomoku }, 
+    { path: '/minigames/tetris-game', name: 'TetrisGame', component: TetrisGame },
+    
     {
       path: "*",
       component: NotFound,

@@ -4,6 +4,13 @@ import BoardList from "@/components/board/BoardList";
 import BoardDetail from "@/components/board/BoardDetail";
 import BoardCreate from "@/components/board/BoardCreate";
 
+import MiniGames from '@/components/MiniGames.vue' 
+import BrickBreaker from '@/components/minigame/BrickBreaker.vue' 
+import Tetris from '@/components/minigame/Tetris.vue' 
+import Gomoku from '@/components/minigame/Gomoku.vue' 
+import AvoidObstacles from '@/components/minigame/AvoidObstacles.vue' 
+import AirplaneShooting from '@/components/minigame/AirplaneShooting.vue'
+
 import MainPage from "@/components/MainPage";
 import LoginPage from "@/components/login/LoginPage";
 import Calculator from "@/components/CalculatorComp";
@@ -46,6 +53,12 @@ const router = new VueRouter({
       name: "BoardCreate",
       component: BoardCreate,
     },
+    { path: '/minigames', name: 'MiniGames', component: MiniGames },
+    { path: '/minigames/brick-breaker', name: 'BrickBreaker', component: BrickBreaker }, 
+    { path: '/minigames/tetris', name: 'Tetris', component: Tetris }, 
+    { path: '/minigames/gomoku', name: 'Gomoku', component: Gomoku }, 
+    { path: '/minigames/avoid-obstacles', name: 'AvoidObstacles', component: AvoidObstacles }, 
+    { path: '/minigames/airplane-shooting', name: 'AirplaneShooting', component: AirplaneShooting },
     {
       path: "*",
       component: NotFound,

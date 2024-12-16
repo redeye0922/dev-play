@@ -233,9 +233,18 @@ export default {
       }
       
       const quitGame = () => {
-        this.cleanup()
-        this.$destroy()
+        if (this.eventListenersAdded) {
+          document.removeEventListener('keydown', this.handleKeydown)
+          this.eventListenersAdded = false
+        }
+        if (this.moveTimerId !== null) {
+          clearTimeout(this.moveTimerId)
+          this.moveTimerId = null
+        }
         this.$router.push('/minigames')
+        this.$nextTick(() => {
+          this.$destroy()
+        })
       }
 
       document.addEventListener('keydown', this.handleKeydown)

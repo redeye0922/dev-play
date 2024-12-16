@@ -27,6 +27,10 @@ export default {
   beforeDestroy() {
     this.cleanup()
   },
+  beforeRouteLeave (to, from, next) {
+    this.cleanup()
+    next()
+  },
   methods: {
     loadBrython() {
       const script = document.createElement('script')

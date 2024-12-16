@@ -292,6 +292,10 @@ export default {
       brythonScripts.forEach(script => script.remove());
       const brythonStdlibScripts = document.querySelectorAll('script[src*="brython_stdlib"]');
       brythonStdlibScripts.forEach(script => script.remove());
+
+      // Brython 관련 DOM 요소도 제거합니다.
+      const brythonElems = document.querySelectorAll('[type="text/python"]');
+      brythonElems.forEach(elem => elem.remove());
     }
   }
 }
@@ -313,4 +317,3 @@ button {
   font-size: 16px;
 }
 </style>
-      

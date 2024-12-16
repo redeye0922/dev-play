@@ -84,22 +84,22 @@ export default {
           row.forEach((cell, x) => {
             if (cell) {
               ctx.fillStyle = 'blue'
-              ctx.fillRect((x + offset[1]) * BLOCK_SIZE, (y + offset[0]) * BLOCK SIZE, BLOCK SIZE, BLOCK SIZE)
+              ctx.fillRect((x + offset[1]) * BLOCK_SIZE, (y + offset[0]) * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE)
             }
           })
         })
       }
 
       const drawBoard = () => {
-        ctx.clearRect(0, 0, WIDTH * BLOCK SIZE, HEIGHT * BLOCK SIZE)
+        ctx.clearRect(0, 0, WIDTH * BLOCK_SIZE, HEIGHT * BLOCK_SIZE)
         ctx.strokeStyle = 'white'
         ctx.lineWidth = 4 // 경계선 두께를 두껍게 설정
-        ctx.strokeRect(0, 0, WIDTH * BLOCK SIZE, HEIGHT * BLOCK SIZE)
+        ctx.strokeRect(0, 0, WIDTH * BLOCK_SIZE, HEIGHT * BLOCK_SIZE)
         board.forEach((row, y) => {
           row.forEach((cell, x) => {
             if (cell) {
               ctx.fillStyle = 'blue'
-              ctx.fillRect(x * BLOCK SIZE, y * BLOCK SIZE, BLOCK SIZE, BLOCK SIZE)
+              ctx.fillRect(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE)
             }
           })
         })

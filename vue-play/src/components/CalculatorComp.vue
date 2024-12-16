@@ -153,13 +153,18 @@ body {
   align-items: center;
   min-height: 100vh;
   background-color: #eee;
+  margin: 0; /* 여백 제거 */
+  padding: 0; /* 여백 제거 */
 }
 
 .calculator-app {
   --button-width: 80px;
   --button-height: 80px;
 
-  display: grid;
+  display: flex; /* 추가 */
+  justify-content: center; /* 추가 */
+  align-items: center; /* 추가 */
+  flex-direction: column; /* 추가 */
   grid-template-areas:
     "result result result result"
     "ac plus-minus percent divide"
@@ -174,7 +179,7 @@ body {
     8px 8px 16px -10px rgba(0, 0, 0, 0.15);
   padding: 24px;
   border-radius: 20px;
-  box-sizing: border-box; /* 추가: 전체 컴포넌트를 화면에 맞게 조정 */
+  box-sizing: border-box; /* 전체 컴포넌트를 화면에 맞게 조정 */
 }
 
 .calculator-app button {
@@ -205,9 +210,11 @@ body {
 .calculator-app-result {
   text-align: right;
   line-height: var(--button-height);
-  font-size: 48px;
+  font-size: 56px; /* 폰트 크기 증가 */
   font-family: Helvetica;
   padding: 0 20px;
   color: #666;
+  height: calc(var(--button-height) * 1.5); /* 결과 표시 영역 높이 조정 */
 }
 </style>
+

@@ -18,7 +18,8 @@ export default {
     return {
       eventListenersAdded: false,
       moveTimerId: null,
-      tetrisKeydownHandler: null // Tetris 전용 키 다운 핸들러
+      tetrisKeydownHandler: null, // Tetris 전용 키 다운 핸들러
+      gameInitialized: false,
     }
   },
   mounted() {
@@ -28,6 +29,7 @@ export default {
     this.cleanup('beforeDestroy')
   },
   destroyed() {
+    console.log('TetrisGame destroyed');
     this.cleanup('destroyed')
   },
   methods: {
@@ -47,6 +49,8 @@ export default {
       document.head.appendChild(script)
     },
     initializeGame() {
+      if (this.gameInitialized) return;
+      
       const canvas = document.getElementById('game-canvas')
       const ctx = canvas.getContext('2d')
 
@@ -248,8 +252,11 @@ export default {
       document.getElementById('quit-btn').addEventListener('click', quitGame)
 
       startGame()
+      this.gameInitialized = true
     },
+
     cleanup(source) {
+      console.log(`Cleaning up from ${source}`)
       if (this.eventListenersAdded) {
         document.removeEventListener('keydown', this.tetrisKeydownHandler)
         this.eventListenersAdded = false
@@ -258,7 +265,6 @@ export default {
         clearTimeout(this.moveTimerId)
         this.moveTimerId = null
       }
-      console.log(`Cleaning up from ${source}`)
       // Brython 관련 리소스를 정리합니다.
       const brythonScripts = document.querySelectorAll('script[src*="brython"]')
       brythonScripts.forEach(script => script.remove())
@@ -296,5 +302,3 @@ button {
   font-size: 16px;
 }
 </style>
-
-    

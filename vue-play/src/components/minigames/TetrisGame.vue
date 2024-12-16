@@ -17,7 +17,7 @@ export default {
   data() {
     return {
       eventListenersAdded: false,
-      moveTimerId: null
+      moveTimerId: null,
     }
   },
   mounted() {
@@ -276,3 +276,4 @@ button {
   font-size: 16px;
 }
 </style>
+      

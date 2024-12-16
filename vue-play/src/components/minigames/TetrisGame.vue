@@ -155,6 +155,7 @@ export default {
           })
         })
       }
+
       const clearLines = () => {
         const newBoard = board.filter(row => row.some(cell => cell === 0))
         const linesCleared = HEIGHT - newBoard.length
@@ -230,7 +231,7 @@ export default {
         }
         drawBoard()
       }
-
+      
       const quitGame = () => {
         this.cleanup()
         this.$destroy()

@@ -7,7 +7,7 @@
 
 <script>
 export default {
-  name: 'Gomoku',
+  name: 'GomokuGame',
   mounted() {
     this.loadBrython()
   },

@@ -94,7 +94,7 @@ export default {
         ctx.clearRect(0, 0, WIDTH * BLOCK_SIZE, HEIGHT * BLOCK_SIZE)
         ctx.strokeStyle = 'white'
         ctx.lineWidth = 4 // 경계선 두께를 두껍게 설정
-        ctx.strokeRect(0, 0, WIDTH * BLOCK_SIZE, HEIGHT * BLOCK_SIZE)
+        ctx.strokeRect(0, 0, WIDTH * BLOCK_SIZE, HEIGHT * BLOCK SIZE)
         board.forEach((row, y) => {
           row.forEach((cell, x) => {
             if (cell) {
@@ -158,7 +158,7 @@ export default {
       }
 
       const clearLines = () => {
-        const newBoard = board.filter(row => row.some(cell => cell === 0))
+        const newBoard = board.filter(row => row.some(cell === 0))
         const linesCleared = HEIGHT - newBoard.length
         if (linesCleared > 0) {
           score += 100 * linesCleared
@@ -234,7 +234,7 @@ export default {
       }
 
       const quitGame = () => {
-        this.cleanup()
+        this.cleanup() // 이벤트 리스너와 타이머를 먼저 정리합니다.
         this.$nextTick(() => {
           this.$destroy()
           this.$router.push('/minigames')
@@ -279,4 +279,3 @@ button {
   font-size: 16px;
 }
 </style>
-  

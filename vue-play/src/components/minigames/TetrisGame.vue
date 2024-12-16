@@ -158,7 +158,7 @@ export default {
       }
 
       const clearLines = () => {
-        const newBoard = board.filter(row => row.some(cell => cell === 0))
+        const newBoard = board.filter(row => row.some(cell === 0))
         const linesCleared = HEIGHT - newBoard.length
         if (linesCleared > 0) {
           score += 100 * linesCleared
@@ -198,7 +198,7 @@ export default {
         return board[0].some(cell => cell === 1)
       }
 
-           const gameOver = () => {
+      const gameOver = () => {
         gameOverFlag = true
         alert('게임 종료! 다시 시작하시겠습니까?', confirmAction => {
           if (confirmAction) {
@@ -237,7 +237,9 @@ export default {
         this.cleanup()
         this.$nextTick(() => {
           this.$router.push('/minigames')
-          this.$destroy()
+          setTimeout(() => {
+            this.$destroy()
+          }, 100)
         })
       }
 

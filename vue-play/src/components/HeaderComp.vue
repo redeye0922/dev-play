@@ -14,6 +14,7 @@
           <b-nav-item to="/login" @click="navClick">로그인</b-nav-item>
           <b-nav-item to="/calculator" @click="navClick">계산기</b-nav-item>
           <b-nav-item to="/board" @click="navClick">자유게시판</b-nav-item>
+          <b-nav-item to="/minigames" @click="navClick">미니게임</b-nav-item>
         </b-navbar-nav>
       </b-collapse>
     </b-navbar>

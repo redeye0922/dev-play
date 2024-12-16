@@ -299,8 +299,8 @@ export default {
       brythonElems.forEach(elem => elem.remove());
 
       // Brython 파이썬 런타임 종료
-      if (typeof window.__BRYTHON__ !== 'undefined') {
-        window.__BRYTHON__.py_end();
+      if (window.Brython && window.Brython.python_to_js) {
+        window.Brython.python_to_js.py_end();
       }
     }
   }

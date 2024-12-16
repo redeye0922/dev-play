@@ -24,8 +24,9 @@ export default {
   mounted() {
     this.loadBrython()
   },
-  beforeDestroy() {
+  beforeRouteLeave(to, from, next) {
     this.cleanup()
+    next()
   },
   methods: {
     loadBrython() {

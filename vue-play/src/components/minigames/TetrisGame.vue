@@ -25,7 +25,10 @@ export default {
     this.loadBrython()
   },
   beforeDestroy() {
-    this.cleanup()
+    this.cleanup('beforeDestroy')
+  },
+  destroyed() {
+    this.cleanup('destroyed')
   },
   methods: {
     loadBrython() {
@@ -234,11 +237,8 @@ export default {
       }
 
       const quitGame = () => {
-        this.cleanup()
-        this.$nextTick(() => {
-          this.$router.push('/minigames')
-          this.$destroy()
-        })
+        this.cleanup('quitGame')
+        this.$router.push('/minigames')
       }
 
       document.addEventListener('keydown', this.tetrisKeydownHandler)
@@ -249,8 +249,7 @@ export default {
 
       startGame()
     },
-
-    cleanup() {
+    cleanup(source) {
       if (this.eventListenersAdded) {
         document.removeEventListener('keydown', this.tetrisKeydownHandler)
         this.eventListenersAdded = false
@@ -258,6 +257,23 @@ export default {
       if (this.moveTimerId !== null) {
         clearTimeout(this.moveTimerId)
         this.moveTimerId = null
+      }
+      console.log(`Cleaning up from ${source}`)
+      // Brython 관련 리소스를 정리합니다.
+      const brythonScripts = document.querySelectorAll('script[src*="brython"]')
+      brythonScripts.forEach(script => script.remove())
+      const brythonStdlibScripts = document.querySelectorAll('script[src*="brython_stdlib"]')
+      brythonStdlibScripts.forEach(script => script.remove())
+
+      // Brython 관련 DOM 요소도 제거합니다.
+      const brythonElems = document.querySelectorAll('[type="text/python"]')
+      brythonElems.forEach(elem => elem.remove())
+
+      // Brython 객체를 제거합니다.
+      if (typeof window.__BRYTHON__ !== 'undefined') {
+        window.__BRYTHON__.$options = null
+        window.__BRYTHON__.stdlib_path = null
+        window.__BRYTHON__.py_namespaces = null
       }
     }
   }
@@ -280,3 +296,5 @@ button {
   font-size: 16px;
 }
 </style>
+
+    

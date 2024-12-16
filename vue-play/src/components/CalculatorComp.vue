@@ -161,10 +161,7 @@ body {
   --button-width: 80px;
   --button-height: 80px;
 
-  display: flex; /* 추가 */
-  justify-content: center; /* 추가 */
-  align-items: center; /* 추가 */
-  flex-direction: column; /* 추가 */
+  display: grid; /* display: grid를 유지 */
   grid-template-areas:
     "result result result result"
     "ac plus-minus percent divide"

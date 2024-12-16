@@ -68,6 +68,16 @@ const router = new VueRouter({
   ],
 });
 
+// 모든 라우트 변경 전에 미니게임 종료 로직 호출 
+router.beforeEach((to, from, next) => { 
+  if (from.name === 'TetrisGame' || from.name === 'AirplaneShooting' || from.name === 'AvoidObstacles' || from.name === 'BrickBreaker' || from.name === 'Gomoku') {
+    const activeGameComponent = router.app.$children.find(comp => comp.$options.name === from.name);
+    if (activeGameComponent && activeGameComponent.cleanup) {
+      activeGameComponent.cleanup(); 
+    } 
+  } next(); 
+});
+
 //처음 시작을 /login으로 시작하게 처리
 router.replace("/login");
 export default router;

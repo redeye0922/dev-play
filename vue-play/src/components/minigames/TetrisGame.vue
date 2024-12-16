@@ -6,8 +6,8 @@
       <button @click="restartGame">다시하기</button>
       <button @click="quitGame">종료하기</button>
     </div>
-    <div id="score">점수: 0</div>
-    <div id="level">단계: 1</div>
+    <div id="score">Score: 0</div>
+    <div id="level">Level: 1</div>
   </div>
 </template>
 
@@ -44,20 +44,20 @@ export default {
       let blockPosition = [0, 3]
       let score = 0
       let level = 1
-      let game_over_flag = false
-      let move_timer_id = null
+      let gameOverFlag = false
+      let moveTimerId = null
 
-      const speed_by_level = { 1: 1000, 2: 900, 3: 800, 4: 700, 5: 600, 6: 500, 7: 400, 8: 300, 9: 200, 10: 100 }
-      let game_speed = speed_by_level[level]
+      const speedByLevel = {1: 1000, 2: 900, 3: 800, 4: 700, 5: 600, 6: 500, 7: 400, 8: 300, 9: 200, 10: 100}
+      let gameSpeed = speedByLevel[level]
 
       const shapes = [
-        [[1, 1, 1], [0, 1, 0]],
-        [[1, 1, 1, 1]],
-        [[1, 1], [1, 1]],
-        [[1, 1, 0], [0, 1, 1]],
-        [[0, 1, 1], [1, 1, 0]],
-        [[1, 1, 1], [1, 0, 0]],
-        [[1, 1, 1], [0, 0, 1]]
+        [[1, 1, 1], [0, 1, 0]],  // T shape
+        [[1, 1, 1, 1]],           // I shape
+        [[1, 1], [1, 1]],         // O shape
+        [[1, 1, 0], [0, 1, 1]],   // S shape
+        [[0, 1, 1], [1, 1, 0]],   // Z shape
+        [[1, 1, 1], [1, 0, 0]],   // L shape
+        [[1, 1, 1], [0, 0, 1]]    // J shape
       ]
 
       const createBlock = () => {
@@ -65,9 +65,7 @@ export default {
       }
 
       const rotateBlock = () => {
-        currentBlock = currentBlock[0].map((_, index) =>
-          currentBlock.map(row => row[index]).reverse()
-        )
+        currentBlock = currentBlock[0].map((_, i) => currentBlock.map(row => row[i])).reverse()
       }
 
       const drawBlock = (block, offset) => {
@@ -91,19 +89,30 @@ export default {
             }
           })
         })
-        if (currentBlock) drawBlock(currentBlock, blockPosition)
-        if (!game_over_flag) scheduleNextMove()
+        if (currentBlock) {
+          drawBlock(currentBlock, blockPosition)
+        }
+        if (!gameOverFlag) {
+          scheduleNextMove()
+        }
       }
 
       const validPosition = (block, offset) => {
-        return block.every((row, y) =>
-          row.every((cell, x) =>
-            !cell || (
-              x + offset[1] >= 0 && x + offset[1] < WIDTH &&
-              y + offset[0] < HEIGHT && !board[y + offset[0]][x + offset[1]]
-            )
-          )
-        )
+        return block.every((row, y) => {
+          return row.every((cell, x) => {
+            if (cell) {
+              const newX = x + offset[1]
+              const newY = y + offset[0]
+              if (newX < 0 || newX >= WIDTH || newY < 0 || newY >= HEIGHT) {
+                return false
+              }
+              if (board[newY][newX]) {
+                return false
+              }
+            }
+            return true
+          })
+        })
       }
 
       const moveBlock = (dy, dx) => {
@@ -116,7 +125,7 @@ export default {
       }
 
       const dropBlock = () => {
-        while (moveBlock(1, 0)) { }
+        while (moveBlock(1, 0));
         mergeBlock()
         clearLines()
         createBlock()
@@ -127,56 +136,113 @@ export default {
       const mergeBlock = () => {
         currentBlock.forEach((row, y) => {
           row.forEach((cell, x) => {
-            if (cell) board[blockPosition[0] + y][blockPosition[1] + x] = 1
+            if (cell) {
+              board[blockPosition[0] + y][blockPosition[1] + x] = 1
+            }
           })
         })
       }
 
       const clearLines = () => {
-        const newBoard = board.filter(row => row.some(cell => !cell))
+        const newBoard = board.filter(row => row.some(cell => cell === 0))
         const linesCleared = HEIGHT - newBoard.length
         if (linesCleared > 0) {
           score += 100 * linesCleared
-          document.getElementById('score').textContent = `점수: ${score}`
+          document.getElementById('score').textContent = `Score: ${score}`
           if (score >= 1000 * level) {
-            level++
-            game_speed = speed_by_level[level] || game_speed
-            document.getElementById('level').textContent = `단계: ${level}`
+            level += 1
+            gameSpeed = speedByLevel[level] || gameSpeed
+            document.getElementById('level').textContent = `Level: ${level}`
           }
-          board = [...Array(linesCleared).fill(Array(WIDTH).fill(0)), ...newBoard]
         }
-      }
-
-      const keyPressed = (event) => {
-        if (game_over_flag) return
-        if (event.key === 'ArrowLeft') moveBlock(0, -1)
-        else if (event.key === 'ArrowRight') moveBlock(0, 1)
-        else if (event.key === 'ArrowDown') moveBlock(1, 0)
-        else if (event.key === 'ArrowUp') rotateBlock()
-        else if (event.key === ' ') dropBlock()
-        drawBoard()
+        board = Array.from({ length: linesCleared }, () => Array(WIDTH).fill(0)).concat(newBoard)
       }
 
       const scheduleNextMove = () => {
-        if (move_timer_id !== null) clearTimeout(move_timer_id)
-        move_timer_id = setTimeout(update, game_speed)
+        if (moveTimerId !== null) {
+          clearTimeout(moveTimerId)
+        }
+        moveTimerId = setTimeout(update, gameSpeed)
       }
 
       const update = () => {
-        if (game_over_flag) return
+        if (gameOverFlag) return
         if (!moveBlock(1, 0)) {
           mergeBlock()
           clearLines()
           createBlock()
           blockPosition = [0, 3]
-          if (board[0].some(cell => cell)) {
-            game_over_flag = true
-            alert('게임 종료! 다시 시작하시겠습니까?', { confirmAction: startGame })
+          if (checkGameOver()) {
+            gameOver()
             return
           }
         }
         drawBoard()
       }
 
+      const checkGameOver = () => {
+        return board[0].some(cell => cell === 1)
+      }
+
+      const gameOver = () => {
+        gameOverFlag = true
+        alert('게임 종료! 다시 시작하시겠습니까?', confirmAction => {
+          if (confirmAction) {
+            startGame()
+          }
+        })
+      }
+
       const startGame = () => {
-        board = Array.from
+        blockPosition = [0, 3]
+        createBlock()
+        score = 0
+        level = 1
+        board = Array.from({ length: HEIGHT }, () => Array(WIDTH).fill(0))
+        gameSpeed = speedByLevel[level]
+        gameOverFlag = false
+        drawBoard()
+      }
+
+      document.addEventListener('keydown', event => {
+        if (event.key === 'ArrowLeft') {
+          moveBlock(0, -1)
+        } else if (event.key === 'ArrowRight') {
+          moveBlock(0, 1)
+        } else if (event.key === 'ArrowDown') {
+          moveBlock(1, 0)
+        } else if (event.key === 'ArrowUp') {
+          rotateBlock()
+        } else if (event.key === ' ') {
+          dropBlock()
+        }
+        drawBoard()
+      })
+
+      document.getElementById('restart-btn').addEventListener('click', startGame)
+      document.getElementById('quit-btn').addEventListener('click', () => {
+        alert('게임을 종료합니다.')
+      })
+
+      startGame()
+    }
+  }
+}
+</script>
+
+<style scoped>
+#game-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+#controls {
+  display: flex;
+  justify-content: space-around;
+  width: 300px;
+  margin: 10px 0;
+}
+button {
+  font-size: 16px;
+}
+</style>

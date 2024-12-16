@@ -250,15 +250,14 @@ export default {
 
       startGame()
     },
-    
     cleanup() {
       if (this.eventListenersAdded) {
-        document.removeEventListener('keydown', this.tetrisKeydownHandler);
-        this.eventListenersAdded = false;
+        document.removeEventListener('keydown', this.tetrisKeydownHandler)
+        this.eventListenersAdded = false
       }
       if (this.moveTimerId !== null) {
-        clearTimeout(this.moveTimerId);
-        this.moveTimerId = null;
+        clearTimeout(this.moveTimerId)
+        this.moveTimerId = null
       }
     }
   }

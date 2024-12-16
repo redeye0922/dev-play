@@ -288,6 +288,8 @@ export default {
         clearTimeout(this.moveTimerId);
         this.moveTimerId = null;
       }
+      // 강제로 Vue 인스턴스를 파괴합니다.
+      this.$destroy();
     }
   }
 }

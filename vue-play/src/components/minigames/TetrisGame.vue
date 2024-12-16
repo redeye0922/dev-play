@@ -84,7 +84,7 @@ export default {
       const drawBoard = () => {
         ctx.clearRect(0, 0, WIDTH * BLOCK_SIZE, HEIGHT * BLOCK_SIZE)
         ctx.strokeStyle = 'white'
-        ctx.lineWidth = 2
+        ctx.lineWidth = 4 // 경계선 두께를 두껍게 설정
         ctx.strokeRect(0, 0, WIDTH * BLOCK_SIZE, HEIGHT * BLOCK_SIZE)
         board.forEach((row, y) => {
           row.forEach((cell, x) => {
@@ -209,6 +209,10 @@ export default {
         drawBoard()
       }
 
+      const quitGame = () => {
+        this.$router.push('/minigames')
+      }
+
       document.addEventListener('keydown', event => {
         if (event.key === 'ArrowLeft') {
           moveBlock(0, -1)
@@ -225,9 +229,7 @@ export default {
       })
 
       document.getElementById('restart-btn').addEventListener('click', startGame)
-      document.getElementById('quit-btn').addEventListener('click', () => {
-        alert('게임을 종료합니다.')
-      })
+      document.getElementById('quit-btn').addEventListener('click', quitGame)
 
       startGame()
     }

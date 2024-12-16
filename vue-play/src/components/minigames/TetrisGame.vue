@@ -217,7 +217,6 @@ export default {
         gameOverFlag = false
         drawBoard()
       }
-
       this.tetrisKeydownHandler = event => {
         if (event.key === 'ArrowLeft') {
           moveBlock(0, -1)
@@ -249,7 +248,6 @@ export default {
 
       startGame()
     },
-    
     cleanup() {
       if (this.eventListenersAdded) {
         document.removeEventListener('keydown', this.tetrisKeydownHandler)

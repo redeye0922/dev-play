@@ -156,6 +156,7 @@ export default {
           })
         })
       }
+
       const clearLines = () => {
         const newBoard = board.filter(row => row.some(cell => cell === 0))
         const linesCleared = HEIGHT - newBoard.length
@@ -197,7 +198,7 @@ export default {
         return board[0].some(cell => cell === 1)
       }
 
-      const gameOver = () => {
+           const gameOver = () => {
         gameOverFlag = true
         alert('게임 종료! 다시 시작하시겠습니까?', confirmAction => {
           if (confirmAction) {
@@ -233,10 +234,10 @@ export default {
       }
 
       const quitGame = () => {
-        this.cleanup() // 이벤트 리스너와 타이머를 먼저 정리합니다.
+        this.cleanup()
         this.$nextTick(() => {
-          this.$destroy()
           this.$router.push('/minigames')
+          this.$destroy()
         })
       }
 
@@ -278,5 +279,3 @@ button {
   font-size: 16px;
 }
 </style>
-
-      

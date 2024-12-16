@@ -27,11 +27,11 @@ export default {
   },
   beforeDestroy() {
     console.log('TetrisGame beforeDestroy');
-    this.cleanup();
+    this.cleanup('beforeDestroy');
   },
   beforeRouteLeave (to, from, next) {
     console.log('TetrisGame beforeRouteLeave');
-    this.cleanup();
+    this.cleanup('beforeRouteLeave');
     next();
   },
   methods: {
@@ -221,7 +221,7 @@ export default {
         return board[0].some(cell => cell === 1);
       };
 
-      const gameOver = () => {
+           const gameOver = () => {
         console.log('Game over');
         gameOverFlag = true;
         alert('게임 종료! 다시 시작하시겠습니까?', confirmAction => {
@@ -243,7 +243,7 @@ export default {
         drawBoard();
       };
 
-         this.tetrisKeydownHandler = event => {
+      this.tetrisKeydownHandler = event => {
         console.log('Keydown event', event);
         if (event.key === 'ArrowLeft') {
           moveBlock(0, -1);
@@ -261,7 +261,7 @@ export default {
 
       const quitGame = () => {
         console.log('Quitting game');
-        this.cleanup();
+        this.cleanup('quitGame');
         this.$router.push('/minigames');
       };
 
@@ -273,8 +273,8 @@ export default {
 
       startGame();
     },
-    cleanup() {
-      console.log('Cleaning up');
+    cleanup(source) {
+      console.log(`Cleaning up from ${source}`);
       if (this.eventListenersAdded) {
         document.removeEventListener('keydown', this.tetrisKeydownHandler);
         this.eventListenersAdded = false;
@@ -304,4 +304,3 @@ button {
   font-size: 16px;
 }
 </style>
-   

@@ -249,7 +249,6 @@ export default {
 
       startGame()
     },
-
     cleanup() {
       if (this.eventListenersAdded) {
         document.removeEventListener('keydown', this.tetrisKeydownHandler)
@@ -280,3 +279,4 @@ button {
   font-size: 16px;
 }
 </style>
+  

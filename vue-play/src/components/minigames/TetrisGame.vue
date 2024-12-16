@@ -23,6 +23,8 @@ export default {
   },
   mounted() {
     this.loadBrython()
+    // handleKeydown 바인딩 
+    this.handleKeydown = this.handleKeydown.bind(this)
   },
   beforeDestroy() {
     this.cleanup()
@@ -218,7 +220,7 @@ export default {
         drawBoard()
       }
       
-      this.handleKeydown = event => {
+      const handleKeydown = (event) => {
         if (event.key === 'ArrowLeft') {
           moveBlock(0, -1)
         } else if (event.key === 'ArrowRight') {
@@ -235,13 +237,10 @@ export default {
 
       const quitGame = () => {
         this.cleanup()
-        this.$destroy()
         this.$router.push('/minigames')
       }
 
       document.addEventListener('keydown', this.handleKeydown)
-      this.eventListenersAdded = true
-
       document.getElementById('restart-btn').addEventListener('click', startGame)
       document.getElementById('quit-btn').addEventListener('click', quitGame)
 

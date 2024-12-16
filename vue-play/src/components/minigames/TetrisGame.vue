@@ -235,10 +235,10 @@ export default {
 
       const quitGame = () => {
         this.cleanup()
-        this.$nextTick(() => {
-          this.$router.push('/minigames')
+        setTimeout(() => {
           this.$destroy()
-        })
+          this.$router.push('/minigames')
+        }, 100)
       }
 
       document.addEventListener('keydown', this.tetrisKeydownHandler)
@@ -249,7 +249,6 @@ export default {
 
       startGame()
     },
-
     cleanup() {
       if (this.eventListenersAdded) {
         document.removeEventListener('keydown', this.tetrisKeydownHandler)

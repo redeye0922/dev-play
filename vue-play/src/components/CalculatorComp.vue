@@ -1,6 +1,6 @@
 <template>
-  <div class="calculator">
-    <div class="result" style="grid-area: result">
+  <div class="calculator-app">
+    <div class="calculator-app-result" style="grid-area: result">
       {{ equation }}
     </div>
 
@@ -155,7 +155,7 @@ body {
   background-color: #eee;
 }
 
-.calculator {
+.calculator-app {
   --button-width: 80px;
   --button-height: 80px;
 
@@ -176,7 +176,7 @@ body {
   border-radius: 20px;
 }
 
-.calculator button {
+.calculator-app button {
   margin: 8px;
   padding: 0;
   border: 0;
@@ -196,12 +196,12 @@ body {
     4px 4px 10px -8px rgba(0, 0, 0, 0.3);
 }
 
-.calculator button:active {
+.calculator-app button:active {
   box-shadow: -4px -4px 10px -8px rgba(255, 255, 255, 1) inset,
     4px 4px 10px -8px rgba(0, 0, 0, 0.3) inset;
 }
 
-.result {
+.calculator-app-result {
   text-align: right;
   line-height: var(--button-height);
   font-size: 48px;
@@ -210,5 +210,3 @@ body {
   color: #666;
 }
 </style>
-
-

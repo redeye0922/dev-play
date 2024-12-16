@@ -5,11 +5,11 @@ import BoardDetail from "@/components/board/BoardDetail";
 import BoardCreate from "@/components/board/BoardCreate";
 
 import MiniGames from '@/components/MiniGames.vue' 
-import BrickBreaker from '@/components/minigame/BrickBreaker.vue' 
-import Tetris from '@/components/minigame/Tetris.vue' 
-import Gomoku from '@/components/minigame/Gomoku.vue' 
-import AvoidObstacles from '@/components/minigame/AvoidObstacles.vue' 
-import AirplaneShooting from '@/components/minigame/AirplaneShooting.vue'
+import BrickBreaker from '@/components/minigames/BrickBreaker.vue' 
+import Tetris from '@/components/minigames/TetrisGame.vue' 
+import Gomoku from '@/components/minigames/Gomoku.vue' 
+import AvoidObstacles from '@/components/minigames/AvoidObstacles.vue' 
+import AirplaneShooting from '@/components/minigames/AirplaneShooting.vue'
 
 import MainPage from "@/components/MainPage";
 import LoginPage from "@/components/login/LoginPage";

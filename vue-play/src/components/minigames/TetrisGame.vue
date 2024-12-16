@@ -233,9 +233,12 @@ export default {
       }
 
       const quitGame = () => {
+        // Quit 버튼 클릭 시 이 부분에서 안전하게 정리
         this.cleanup()
-        this.$destroy()
-        this.$router.push('/minigames')
+        this.$nextTick(() => {
+          this.$destroy()
+          this.$router.push('/minigames')
+        })
       }
 
       document.addEventListener('keydown', this.handleKeydown)
@@ -246,6 +249,7 @@ export default {
 
       startGame()
     },
+    
     cleanup() {
       if (this.eventListenersAdded) {
         document.removeEventListener('keydown', this.handleKeydown)
@@ -276,4 +280,3 @@ button {
   font-size: 16px;
 }
 </style>
-      

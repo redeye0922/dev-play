@@ -31,7 +31,8 @@ export default {
   },
   destroyed() {
     console.log('TetrisGame destroyed');
-    this.cleanup('destroyed');
+    // 여기서 Vue 인스턴스를 완전히 제거
+    this.$el.innerHTML = '';
   },
   beforeRouteLeave (to, from, next) {
     console.log('TetrisGame beforeRouteLeave');
@@ -235,7 +236,6 @@ export default {
           }
         });
       };
-
       const startGame = () => {
         console.log('Starting new game');
         blockPosition = [0, 3];
@@ -288,8 +288,6 @@ export default {
         clearTimeout(this.moveTimerId);
         this.moveTimerId = null;
       }
-      // 강제로 Vue 인스턴스를 파괴합니다.
-      this.$destroy();
     }
   }
 }

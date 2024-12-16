@@ -3,8 +3,8 @@
     <h1>Brick Breaker Game with Brython</h1>
     <canvas id="game-canvas" width="600" height="400"></canvas>
     <div id="controls">
-      <button @click="restartGame">다시하기</button>
-      <button @click="quitGame">종료하기</button>
+      <button id="restart-btn" @click="restartGame">다시하기</button>
+      <button id="quit-btn" @click="quitGame">종료하기</button>
     </div>
     <div id="score">Score: 0</div>
   </div>
@@ -24,7 +24,9 @@ export default {
         const stdlib = document.createElement('script')
         stdlib.src = 'https://cdn.jsdelivr.net/npm/brython@3.9.5/brython_stdlib.js'
         stdlib.onload = () => {
-          this.initializeGame()
+          this.$nextTick(() => {
+            this.initializeGame()
+          })
         }
         document.head.appendChild(stdlib)
       }

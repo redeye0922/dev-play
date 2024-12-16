@@ -161,7 +161,7 @@ body {
   --button-width: 80px;
   --button-height: 80px;
 
-  display: grid; /* display: grid를 유지 */
+  display: grid;
   grid-template-areas:
     "result result result result"
     "ac plus-minus percent divide"
@@ -169,7 +169,7 @@ body {
     "number-4 number-5 number-6 subtract"
     "number-1 number-2 number-3 add"
     "number-0 number-0 dot equal";
-  grid-template-columns: repeat(4, var(--button-width));
+  grid-template-columns: repeat(4, 1fr); /* 균등한 열 크기 설정 */
   grid-template-rows: repeat(6, var(--button-height));
 
   box-shadow: -8px -8px 16px -10px rgba(255, 255, 255, 1),
@@ -212,6 +212,8 @@ body {
   padding: 0 20px;
   color: #666;
   height: calc(var(--button-height) * 1.5); /* 결과 표시 영역 높이 조정 */
+  grid-area: result; /* grid-area 적용 */
 }
 </style>
+
 

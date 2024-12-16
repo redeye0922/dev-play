@@ -93,6 +93,7 @@ export default {
           })
         })
       }
+
       const drawBoard = () => {
         ctx.clearRect(0, 0, WIDTH * BLOCK_SIZE, HEIGHT * BLOCK_SIZE)
         ctx.strokeStyle = 'white'
@@ -161,7 +162,7 @@ export default {
       }
 
       const clearLines = () => {
-        const newBoard = board.filter(row => row.some(cell === 0))
+        const newBoard = board.filter(row => row.some(cell => cell === 0))
         const linesCleared = HEIGHT - newBoard.length
         if (linesCleared > 0) {
           score += 100 * linesCleared
@@ -249,14 +250,15 @@ export default {
 
       startGame()
     },
+    
     cleanup() {
       if (this.eventListenersAdded) {
-        document.removeEventListener('keydown', this.tetrisKeydownHandler)
-        this.eventListenersAdded = false
+        document.removeEventListener('keydown', this.tetrisKeydownHandler);
+        this.eventListenersAdded = false;
       }
       if (this.moveTimerId !== null) {
-        clearTimeout(this.moveTimerId)
-        this.moveTimerId = null
+        clearTimeout(this.moveTimerId);
+        this.moveTimerId = null;
       }
     }
   }
@@ -279,5 +281,3 @@ button {
   font-size: 16px;
 }
 </style>
-
-      

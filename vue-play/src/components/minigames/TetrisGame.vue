@@ -3,7 +3,7 @@
     <h1>Tetris Game with Brython</h1>
     <canvas id="game-canvas" width="300" height="600"></canvas>
     <div id="controls">
-      <button id="restart-btn" @click="restartGame">다시하기</button>
+      <button id="restart-btn" @click="startGame">다시하기</button>
       <button id="quit-btn" @click="quitGame">종료하기</button>
     </div>
     <div id="score">Score: 0</div>
@@ -158,7 +158,7 @@ export default {
       }
 
       const clearLines = () => {
-        const newBoard = board.filter(row => row.some(cell => cell === 0))
+        const newBoard = board.filter(row => row.some(cell === 0))
         const linesCleared = HEIGHT - newBoard.length
         if (linesCleared > 0) {
           score += 100 * linesCleared

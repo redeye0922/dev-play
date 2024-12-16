@@ -209,11 +209,7 @@ export default {
         drawBoard()
       }
 
-      const quitGame = () => {
-        this.$router.push('/minigames')
-      }
-
-      document.addEventListener('keydown', event => {
+      const handleKeydown = event => {
         if (event.key === 'ArrowLeft') {
           moveBlock(0, -1)
         } else if (event.key === 'ArrowRight') {
@@ -226,8 +222,14 @@ export default {
           dropBlock()
         }
         drawBoard()
-      })
+      }
 
+      const quitGame = () => {
+        document.removeEventListener('keydown', handleKeydown)
+        this.$router.push('/minigames')
+      }
+
+      document.addEventListener('keydown', handleKeydown)
       document.getElementById('restart-btn').addEventListener('click', startGame)
       document.getElementById('quit-btn').addEventListener('click', quitGame)
 

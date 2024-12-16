@@ -93,7 +93,6 @@ export default {
           })
         })
       }
-
       const drawBoard = () => {
         ctx.clearRect(0, 0, WIDTH * BLOCK_SIZE, HEIGHT * BLOCK_SIZE)
         ctx.strokeStyle = 'white'
@@ -162,7 +161,7 @@ export default {
       }
 
       const clearLines = () => {
-        const newBoard = board.filter(row => row.some(cell => cell === 0))
+        const newBoard = board.filter(row => row.some(cell === 0))
         const linesCleared = HEIGHT - newBoard.length
         if (linesCleared > 0) {
           score += 100 * linesCleared
@@ -237,14 +236,14 @@ export default {
         drawBoard()
       }
 
-      const quitGame = () => { 
-        this.cleanup() 
-        this.$router.push('/minigames') 
-      } 
-      
-      document.addEventListener('keydown', this.tetrisKeydownHandler) 
+      const quitGame = () => {
+        this.cleanup()
+        this.$router.push('/minigames')
+      }
+
+      document.addEventListener('keydown', this.tetrisKeydownHandler)
       this.eventListenersAdded = true
-      
+
       document.getElementById('restart-btn').addEventListener('click', startGame)
       document.getElementById('quit-btn').addEventListener('click', quitGame)
 
@@ -280,3 +279,5 @@ button {
   font-size: 16px;
 }
 </style>
+
+      

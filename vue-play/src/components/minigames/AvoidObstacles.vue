@@ -1,3 +1,11 @@
+<template> 
+  <div id="game-container"> 
+    <h1>Avoid Obstacles Game with Brython</h1> 
+    <canvas id="game-canvas" width="400" height="600"></canvas> 
+  </div> 
+</template> 
+
+<script>
 export default {
   name: 'AvoidObstacles',
   data() {
@@ -108,6 +116,7 @@ export default {
     }
   }
 }
+</script>
 
 <style scoped>
 #game-container {

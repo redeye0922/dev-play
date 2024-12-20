@@ -1,13 +1,11 @@
-<template>
-  <div id="game-container">
-    <h1>Avoid Obstacles Game with Brython</h1>
-    <canvas id="game-canvas" width="400" height="600"></canvas>
-  </div>
-</template>
-
-<script>
 export default {
   name: 'AvoidObstacles',
+  data() {
+    return {
+      intervalId: null,
+      gameOver: false
+    }
+  },
   mounted() {
     this.loadBrython()
   },
@@ -34,9 +32,11 @@ export default {
       const obstacles = []
 
       const createObstacle = () => {
-        const xPosition = Math.floor(Math.random() * 361)
-        obstacles.push([xPosition, 0])
-        setTimeout(createObstacle, 2000)
+        if (!this.gameOver) {
+          const xPosition = Math.floor(Math.random() * 361)
+          obstacles.push([xPosition, 0])
+          setTimeout(createObstacle, 2000)
+        }
       }
 
       const moveLeft = () => {
@@ -45,6 +45,20 @@ export default {
 
       const moveRight = () => {
         playerX = Math.min(playerX + 20, 360)
+      }
+
+      const checkCollision = (obstacle) => {
+        const playerWidth = 40
+        const playerHeight = 40
+        const obstacleWidth = 40
+        const obstacleHeight = 40
+
+        return !(
+          playerY > obstacle[1] + obstacleHeight ||
+          playerY + playerHeight < obstacle[1] ||
+          playerX > obstacle[0] + obstacleWidth ||
+          playerX + playerWidth < obstacle[0]
+        )
       }
 
       const update = () => {
@@ -56,12 +70,21 @@ export default {
           obstacle[1] += 5
           ctx.fillStyle = 'red'
           ctx.fillRect(obstacle[0], obstacle[1], 40, 40)
+
+          if (checkCollision(obstacle)) {
+            this.gameOver = true
+            alert('게임 오버!')
+            clearTimeout(this.intervalId)
+          }
+
           if (obstacle[1] > 600) {
             obstacles.splice(index, 1)
           }
         })
 
-        setTimeout(update, 50)
+        if (!this.gameOver) {
+          this.intervalId = setTimeout(update, 50)
+        }
       }
 
       document.addEventListener('keydown', event => {
@@ -72,12 +95,19 @@ export default {
         }
       })
 
+      this.gameOver = false
       createObstacle()
       update()
+    },
+    restartGame() {
+      this.initializeGame()
+    },
+    endGame() {
+      this.gameOver = true
+      clearTimeout(this.intervalId)
     }
   }
 }
-</script>
 
 <style scoped>
 #game-container {
@@ -87,5 +117,8 @@ export default {
 }
 #game-canvas {
   border: 1px solid black;
+}
+button {
+  margin: 10px;
 }
 </style>

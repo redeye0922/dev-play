@@ -21,8 +21,8 @@ pipeline {
                     echo "현재 빌드 번호: ${env.BUILD_NUMBER}"
                     def buildNumber = env.BUILD_NUMBER.toInteger()
                     
-                    def major = (buildNumber / 1000).toInteger()
-                    def minor = ((buildNumber / 100).toInteger() % 10).toInteger()
+                    def major = (buildNumber / 100).toInteger()
+                    def minor = ((buildNumber / 10).toInteger() % 10).toInteger()
                     def patch = (buildNumber % 100).toInteger() % 10
         
                     def newTag = "v${major}.${minor}.${patch}"

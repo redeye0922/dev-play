@@ -93,9 +93,10 @@ export default {
       }
 
       const computerMove = () => {
-        // AI 논리: 승리 방지(방어) 및 공격 전략 추가
+        // 랜덤 요소 추가 및 중심에서 시작하도록 수정
         let bestMove = null
         let maxScore = -1
+        let possibleMoves = []
 
         for (let y = 0; y < 15; y++) {
           for (let x = 0; x < 15; x++) {
@@ -108,9 +109,17 @@ export default {
               if (score > maxScore) {
                 maxScore = score
                 bestMove = { x, y }
+              } else if (score === maxScore) {
+                possibleMoves.push({ x, y })
               }
             }
           }
+        }
+
+        // 랜덤하게 움직임 선택
+        if (possibleMoves.length > 0) {
+          const randomIndex = Math.floor(Math.random() * possibleMoves.length)
+          bestMove = possibleMoves[randomIndex]
         }
 
         if (bestMove) {

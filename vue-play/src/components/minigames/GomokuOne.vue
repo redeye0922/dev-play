@@ -56,7 +56,7 @@ export default {
           [1, 0], [0, 1], [1, 1], [1, -1]
         ]
         return directions.some(([dx, dy]) => {
-          return countStones(x, y, dx, dy) === 5
+          return countStones(x, y, dx, dy) + countStones(x, y, -dx, -dy) - 1 >= 5
         })
       }
 
@@ -148,7 +148,6 @@ export default {
           }
         })
 
-        // 현재 사용자가 돌을 놓은 위치와 가까운 곳에 높은 점수를 부여합니다.
         const userLastMove = getLastUserMove()
         if (userLastMove) {
           const distance = Math.abs(x - userLastMove.x) + Math.abs(y - userLastMove.y)

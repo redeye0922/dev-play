@@ -93,23 +93,53 @@ export default {
       }
 
       const computerMove = () => {
-        // 간단한 AI 논리: 빈 칸 중 첫 번째로 발견된 칸에 돌을 놓습니다.
+        // AI 논리: 승리 방지(방어) 및 공격 전략 추가
+        let bestMove = null
+        let maxScore = -1
+
         for (let y = 0; y < 15; y++) {
           for (let x = 0; x < 15; x++) {
             if (board[y][x] === 0) {
+              // 각 위치에 돌을 놓고 점수를 계산
               board[y][x] = currentPlayer
-              drawStone(x, y, currentPlayer)
-              if (checkWinner(x, y)) {
-                ctx.fillStyle = 'red'
-                ctx.font = '30px Arial'
-                ctx.fillText(`Player ${currentPlayer} wins!`, 150, 300)
-                canvas.removeEventListener('mousedown', handleClick)
+              let score = evaluateBoard(x, y, currentPlayer)
+              board[y][x] = 0
+
+              if (score > maxScore) {
+                maxScore = score
+                bestMove = { x, y }
               }
-              currentPlayer = 3 - currentPlayer
-              return
             }
           }
         }
+
+        if (bestMove) {
+          const { x, y } = bestMove
+          board[y][x] = currentPlayer
+          drawStone(x, y, currentPlayer)
+          if (checkWinner(x, y)) {
+            ctx.fillStyle = 'red'
+            ctx.font = '30px Arial'
+            ctx.fillText(`Player ${currentPlayer} wins!`, 150, 300)
+            canvas.removeEventListener('mousedown', handleClick)
+          }
+          currentPlayer = 3 - currentPlayer
+        }
+      }
+
+      const evaluateBoard = (x, y, player) => {
+        // 간단한 평가 함수: 연속된 돌의 개수를 기반으로 점수 계산
+        let score = 0
+        const directions = [
+          [1, 0], [0, 1], [1, 1], [1, -1]
+        ]
+
+        directions.forEach(([dx, dy]) => {
+          let count = countStones(x, y, dx, dy) + countStones(x, y, -dx, -dy) - 1
+          score += count
+        })
+
+        return score
       }
 
       canvas.addEventListener('mousedown', handleClick)

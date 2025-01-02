@@ -97,19 +97,25 @@ export default {
         let maxScore = -1
         let possibleMoves = []
 
-        for (let y = 0; y < 15; y++) {
-          for (let x = 0; x < 15; x++) {
-            if (board[y][x] === 0) {
-              board[y][x] = currentPlayer
-              let score = evaluateMove(x, y)
-              board[y][x] = 0
+        // 사용자 돌의 연속성을 기반으로 컴퓨터의 방어 전략 추가
+        const userThreat = getUserThreat()
+        if (userThreat) {
+          bestMove = userThreat
+        } else {
+          for (let y = 0; y < 15; y++) {
+            for (let x = 0; x < 15; x++) {
+              if (board[y][x] === 0) {
+                board[y][x] = currentPlayer
+                let score = evaluateMove(x, y)
+                board[y][x] = 0
 
-              if (score > maxScore) {
-                maxScore = score
-                bestMove = { x, y }
-                possibleMoves = [{ x, y }]
-              } else if (score === maxScore) {
-                possibleMoves.push({ x, y })
+                if (score > maxScore) {
+                  maxScore = score
+                  bestMove = { x, y }
+                  possibleMoves = [{ x, y }]
+                } else if (score === maxScore) {
+                  possibleMoves.push({ x, y })
+                }
               }
             }
           }
@@ -132,6 +138,26 @@ export default {
           }
           currentPlayer = 3 - currentPlayer
         }
+      }
+
+      const getUserThreat = () => {
+        for (let y = 0; y < 15; y++) {
+          for (let x = 0; x < 15; x++) {
+            if (board[y][x] === 0 && hasUserThreeStones(x, y)) {
+              return { x, y }
+            }
+          }
+        }
+        return null
+      }
+
+      const hasUserThreeStones = (x, y) => {
+        const directions = [
+          [1, 0], [0, 1], [1, 1], [1, -1]
+        ]
+        return directions.some(([dx, dy]) => {
+          return countStones(x - dx, y - dy, -dx, -dy) + countStones(x + dx, y + dy, dx, dy) - 1 >= 3
+        })
       }
 
       const evaluateMove = (x, y) => {

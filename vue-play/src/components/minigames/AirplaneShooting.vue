@@ -92,13 +92,13 @@ export default {
 
       const moveLeft = () => {
         if (this.player.x > 0) {
-          this.player.x -= this.moveStep;
+          this.player.x = Math.max(0, this.player.x - this.moveStep);
         }
       }
 
       const moveRight = () => {
         if (this.player.x < canvas.width - this.player.width) {
-          this.player.x += this.moveStep;
+          this.player.x = Math.min(canvas.width - this.player.width, this.player.x + this.moveStep);
         }
       }
 

@@ -2,6 +2,11 @@
   <div id="game-container">
     <h1>Avoid Obstacles Game with Brython</h1>
     <canvas id="game-canvas" width="400" height="600"></canvas>
+    <div id="controls">
+      <button id="restart-btn" @click="restartGame">Restart</button>
+      <button id="quit-btn" @click="quitGame">Quit</button>
+    </div>
+    <div id="score">Score: 0</div>
   </div>
 </template>
 
@@ -11,7 +16,8 @@ export default {
   data() {
     return {
       intervalId: null,
-      gameOver: false
+      gameOver: false,
+      score: 0
     }
   },
   mounted() {
@@ -95,6 +101,8 @@ export default {
 
           if (obstacle[1] > 600) {
             obstacles.splice(index, 1);
+            this.score += 10;
+            document.getElementById('score').textContent = `Score: ${this.score}`;
           }
         });
 
@@ -111,6 +119,8 @@ export default {
         }
       });
 
+      this.score = 0;
+      document.getElementById('score').textContent = `Score: ${this.score}`;
       this.gameOver = false;
       createObstacle();
       update();
@@ -158,10 +168,16 @@ export default {
   flex-direction: column;
   align-items: center;
 }
-#game-canvas {
-  border: 1px solid black;
+#controls {
+  display: flex;
+  justify-content: space-around;
+  width: 400px;
+  margin: 10px 0;
 }
 button {
-  margin: 10px;
+  font-size: 16px;
+}
+#game-canvas {
+  border: 1px solid black;
 }
 </style>

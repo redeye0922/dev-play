@@ -148,7 +148,25 @@ export default {
           }
         })
 
+        // 현재 사용자가 돌을 놓은 위치와 가까운 곳에 높은 점수를 부여합니다.
+        const userLastMove = getLastUserMove()
+        if (userLastMove) {
+          const distance = Math.abs(x - userLastMove.x) + Math.abs(y - userLastMove.y)
+          score += 100 - distance
+        }
+
         return score
+      }
+
+      const getLastUserMove = () => {
+        for (let y = 0; y < 15; y++) {
+          for (let x = 0; x < 15; x++) {
+            if (board[y][x] === 1) {
+              return { x, y }
+            }
+          }
+        }
+        return null
       }
 
       canvas.addEventListener('mousedown', handleClick)

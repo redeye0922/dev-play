@@ -256,7 +256,6 @@ export default {
         window.__BRYTHON__.stdlib_path = null;
         window.__BRYTHON__.py_namespaces = null;
       }
-      }
 
       // 애니메이션 프레임을 취소합니다.
       if (this.updateInterval) {
@@ -285,4 +284,3 @@ button {
   font-size: 16px;
 }
 </style>
-

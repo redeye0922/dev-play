@@ -13,12 +13,14 @@
 <script>
 export default {
   name: 'BrickBreaker',
-  mounted() {
+  created() {
     this.loadBrython();
-    window.addEventListener('beforeunload', this.cleanup);
   },
   beforeDestroy() {
     this.cleanup();
+  },
+  mounted() {
+    window.addEventListener('beforeunload', this.cleanup);
   },
   methods: {
     loadBrython() {
@@ -38,6 +40,10 @@ export default {
     },
     initializeGame() {
       const canvas = document.getElementById('game-canvas');
+      if (!canvas) {
+        console.error('Canvas element not found in the DOM.');
+        return;
+      }
       const ctx = canvas.getContext('2d');
 
       let paddle_x = 250;
@@ -54,6 +60,10 @@ export default {
       let game_over = false;
 
       const scoreElement = document.getElementById('score');
+      if (!scoreElement) {
+        console.error('Score element not found in the DOM.');
+        return;
+      }
       const colors = ['blue', 'green', 'yellow', 'orange', 'red'];
 
       const createBricks = () => {
@@ -143,10 +153,7 @@ export default {
 
               if (scoreElement) {
                 scoreElement.textContent = `Score: ${score}`;
-              } else {
-                console.error('Score element not found in the DOM.');
               }
-              //document.getElementById('score').textContent = `Score: ${score}`
             }
           }
         }
@@ -188,7 +195,6 @@ export default {
         } else {
           console.error('Score element not found in the DOM.');
         }
-        //document.getElementById('score').textContent = `Score: ${score}`
         game_over = false;
         createBricks();
         update();
@@ -213,9 +219,15 @@ export default {
       update();
     },
     cleanup() {
-      // 정리 작업 수행
-      // 예: 이벤트 리스너 제거
       window.removeEventListener('beforeunload', this.cleanup);
+      document.removeEventListener('keydown', this.handleKeydown);
+    },
+    handleKeydown(event) {
+      if (event.key === 'ArrowLeft') {
+        this.moveLeft();
+      } else if (event.key === 'ArrowRight') {
+        this.moveRight();
+      }
     },
   },
 };

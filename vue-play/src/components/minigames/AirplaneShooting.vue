@@ -85,7 +85,8 @@ export default {
           this.updateBullets();
           this.updateEnemies(ctx);
 
-          this.updateInterval = requestAnimationFrame(updateGame);
+          // 100 밀리초 딜레이로 게임 속도 조절
+          this.updateInterval = setTimeout(updateGame, 100);
         }
       }
 
@@ -184,39 +185,37 @@ export default {
     },
     cleanup(source) {
       console.log(`Cleaning up from ${source}`);
+      this.gameOver = true; // 게임 오버 상태 설정
+      clearTimeout(this.updateInterval);
+      this.updateInterval = null;
+
       const restartBtn = document.getElementById('restart-btn');
       const quitBtn = document.getElementById('quit-btn');
-    
+
       if (restartBtn) {
         restartBtn.removeEventListener('click', this.restartGame);
       }
       if (quitBtn) {
         quitBtn.removeEventListener('click', this.quitGame);
       }
-    
+
       // Brython 관련 리소스를 정리합니다.
       const brythonScripts = document.querySelectorAll('script[src*="brython"]');
       brythonScripts.forEach(script => script.remove());
       const brythonStdlibScripts = document.querySelectorAll('script[src*="brython_stdlib"]');
       brythonStdlibScripts.forEach(script => script.remove());
-    
+
       // Brython 관련 DOM 요소도 제거합니다.
       const brythonElems = document.querySelectorAll('[type="text/python"]');
       brythonElems.forEach(elem => elem.remove());
-    
+
       // Brython 객체를 제거합니다.
       if (typeof window.__BRYTHON__ !== 'undefined') {
         window.__BRYTHON__.$options = null;
         window.__BRYTHON__.stdlib_path = null;
         window.__BRYTHON__.py_namespaces = null;
       }
-    
-      // 애니메이션 프레임을 취소합니다.
-      if (this.updateInterval) {
-        cancelAnimationFrame(this.updateInterval);
-        this.updateInterval = null;
-      }
-    
+
       console.log("Cleanup 완료");
     }
   }

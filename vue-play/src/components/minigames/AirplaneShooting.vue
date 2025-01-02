@@ -21,7 +21,8 @@ export default {
       enemies: [],
       score: 0,
       gameOver: false,
-      updateInterval: null
+      updateInterval: null,
+      moveStep: 40
     }
   },
   mounted() {
@@ -85,20 +86,19 @@ export default {
           this.updateBullets();
           this.updateEnemies(ctx);
 
-          // 100 밀리초 딜레이로 게임 속도 조절
           this.updateInterval = setTimeout(updateGame, 100);
         }
       }
 
       const moveLeft = () => {
         if (this.player.x > 0) {
-          this.player.x -= 20;
+          this.player.x -= this.moveStep;
         }
       }
 
       const moveRight = () => {
         if (this.player.x < canvas.width - this.player.width) {
-          this.player.x += 20;
+          this.player.x += this.moveStep;
         }
       }
 
@@ -161,7 +161,7 @@ export default {
     },
     createEnemy() {
       if (!this.gameOver) {
-        const x_position = Math.random() * 360;
+        const x_position = Math.floor(Math.random() * (400 - 40)); // 적의 위치를 캔버스 폭에 맞게 조정
         const enemy = { x: x_position, y: 0, width: 40, height: 40 };
         this.enemies.push(enemy);
         setTimeout(() => { this.createEnemy(); }, 2000);

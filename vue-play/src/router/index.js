@@ -60,9 +60,7 @@ const router = new VueRouter({
     { path: '/minigames/avoid-obstacles', name: 'AvoidObstacles', component: AvoidObstacles }, 
     { path: '/minigames/brick-breaker', name: 'BrickBreaker', component: BrickBreaker }, 
     { path: '/minigames/gomoku', name: 'Gomoku', component: Gomoku }, 
-    { path: '/minigames/gomoku-one', name: 'Gomoku', component: GomokuOne }, 
-    
-    // <li><router-link to="/minigames/gomoku-one">Gomoku One</router-link></li>
+    { path: '/minigames/gomoku-one', name: 'GomokuOne', component: GomokuOne }, 
     /* { path: '/minigames/tetris-game', name: 'TetrisGame', component: TetrisGame }, */
     
     {

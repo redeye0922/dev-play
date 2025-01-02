@@ -1,6 +1,6 @@
 <template>
   <div id="game-container">
-    <h1>Gomoku Game with Brython</h1>
+    <h1>브라이썬을 이용한 오목 게임</h1>
     <canvas id="game-canvas" width="600" height="600"></canvas>
   </div>
 </template>
@@ -56,7 +56,7 @@ export default {
           [1, 0], [0, 1], [1, 1], [1, -1]
         ]
         return directions.some(([dx, dy]) => {
-          return countStones(x, y, dx, dy) === 5  // 5개의 돌이 연속으로 놓여야 승리
+          return countStones(x, y, dx, dy) === 5
         })
       }
 
@@ -81,19 +81,18 @@ export default {
           if (checkWinner(x, y)) {
             ctx.fillStyle = 'red'
             ctx.font = '30px Arial'
-            ctx.fillText(`Player ${currentPlayer} wins!`, 150, 300)
+            ctx.fillText(`플레이어 ${currentPlayer} 승리!`, 150, 300)
             canvas.removeEventListener('mousedown', handleClick)
           } else {
             currentPlayer = 3 - currentPlayer
             if (currentPlayer === 2) {
-              setTimeout(computerMove, 500)  // 컴퓨터의 차례
+              setTimeout(computerMove, 500)
             }
           }
         }
       }
 
       const computerMove = () => {
-        // AI 논리: 사용자 주변에 전략적으로 돌 놓기
         let bestMove = null
         let maxScore = -1
         let possibleMoves = []
@@ -101,9 +100,8 @@ export default {
         for (let y = 0; y < 15; y++) {
           for (let x = 0; x < 15; x++) {
             if (board[y][x] === 0) {
-              // 각 위치에 돌을 놓고 점수를 계산
               board[y][x] = currentPlayer
-              let score = evaluateBoard(x, y)
+              let score = evaluateMove(x, y)
               board[y][x] = 0
 
               if (score > maxScore) {
@@ -117,7 +115,6 @@ export default {
           }
         }
 
-        // 랜덤하게 움직임 선택
         if (possibleMoves.length > 0) {
           const randomIndex = Math.floor(Math.random() * possibleMoves.length)
           bestMove = possibleMoves[randomIndex]
@@ -130,15 +127,14 @@ export default {
           if (checkWinner(x, y)) {
             ctx.fillStyle = 'red'
             ctx.font = '30px Arial'
-            ctx.fillText(`Player ${currentPlayer} wins!`, 150, 300)
+            ctx.fillText(`플레이어 ${currentPlayer} 승리!`, 150, 300)
             canvas.removeEventListener('mousedown', handleClick)
           }
           currentPlayer = 3 - currentPlayer
         }
       }
 
-      const evaluateBoard = (x, y) => {
-        // 간단한 평가 함수: 연속된 돌의 개수를 기반으로 점수 계산
+      const evaluateMove = (x, y) => {
         let score = 0
         const directions = [
           [1, 0], [0, 1], [1, 1], [1, -1]
@@ -147,8 +143,6 @@ export default {
         directions.forEach(([dx, dy]) => {
           let count = countStones(x, y, dx, dy) + countStones(x, y, -dx, -dy) - 1
           score += count
-
-          // 사용자가 두는 곳 근처일수록 높은 점수
           if (countStones(x, y, dx, dy) > 0 || countStones(x, y, -dx, -dy) > 0) {
             score += 10
           }

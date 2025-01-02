@@ -48,7 +48,8 @@ export default {
       let bricks = []
       let score = 0
       let game_over = false
-
+      
+      const scoreElement = document.getElementById('score');
       const colors = ['blue', 'green', 'yellow', 'orange', 'red']
 
       const createBricks = () => {
@@ -130,7 +131,7 @@ export default {
               row[row.indexOf(brick)] = null
               ball_dy *= -1
               score += 10
-              const scoreElement = document.getElementById('score');
+              
               if (scoreElement) {
                 scoreElement.textContent = `Score: ${score}`
               } else{
@@ -172,7 +173,13 @@ export default {
         ball_dx = 3
         ball_dy = -3
         score = 0
-        document.getElementById('score').textContent = `Score: ${score}`
+        
+        if (scoreElement) {
+          scoreElement.textContent = `Score: ${score}`
+        } else{
+          console.error('Score element not found in the DOM.');
+        }
+        //document.getElementById('score').textContent = `Score: ${score}`
         game_over = false
         createBricks()
         update()

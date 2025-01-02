@@ -56,7 +56,7 @@ export default {
           [1, 0], [0, 1], [1, 1], [1, -1]
         ]
         return directions.some(([dx, dy]) => {
-          return countStones(x, y, dx, dy) + countStones(x, y, -dx, -dy) - 1 >= 5
+          return countStones(x, y, dx, dy) === 5  // 5개의 돌이 연속으로 놓여야 승리
         })
       }
 
@@ -93,7 +93,7 @@ export default {
       }
 
       const computerMove = () => {
-        // 랜덤 요소 추가 및 중심에서 시작하도록 수정
+        // AI 논리: 사용자 주변에 전략적으로 돌 놓기
         let bestMove = null
         let maxScore = -1
         let possibleMoves = []
@@ -109,6 +109,7 @@ export default {
               if (score > maxScore) {
                 maxScore = score
                 bestMove = { x, y }
+                possibleMoves = [{ x, y }]
               } else if (score === maxScore) {
                 possibleMoves.push({ x, y })
               }
@@ -146,6 +147,11 @@ export default {
         directions.forEach(([dx, dy]) => {
           let count = countStones(x, y, dx, dy) + countStones(x, y, -dx, -dy) - 1
           score += count
+
+          // 사용자가 두는 곳 근처일수록 높은 점수
+          if (countStones(x, y, dx, dy) > 0 || countStones(x, y, -dx, -dy) > 0) {
+            score += 10
+          }
         })
 
         return score

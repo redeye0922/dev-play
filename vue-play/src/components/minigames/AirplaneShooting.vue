@@ -3,7 +3,7 @@
     <h1>Airplane Shooting Game</h1>
     <canvas id="game-canvas" width="400" height="600"></canvas>
     <div id="controls">
-      <button id="restart-btn">Restart</button>
+      <button id="restart-btn" @click="restartGame">Restart</button>
       <button id="quit-btn" @click="quitGame">Quit</button>
     </div>
     <div id="score">Score: 0</div>
@@ -167,13 +167,15 @@ export default {
       }
     },
     restartGame() {
+      console.log("게임 재시작");
       this.player = { x: 180, y: 500, width: 40, height: 50, color: 'blue' };
       this.bullets = [];
       this.enemies = [];
       this.score = 0;
       this.gameOver = false;
+      this.gameInitialized = false;
       document.getElementById('score').textContent = 'Score: 0';
-      document.getElementById('restart-btn').disabled = true;
+      document.getElementById('restart-btn').disabled = false;
       this.initializeGame();
     },
     quitGame() {

@@ -90,25 +90,25 @@ export default {
         }
       }
 
-      restartGame() {
+      const restartGame = () => {
         const canvas = document.getElementById('game-canvas')
         const ctx = canvas.getContext('2d')
         ctx.clearRect(0, 0, canvas.width, canvas.height)
-        this.board = Array(15).fill(null).map(() => Array(15).fill(0))
-        this.currentPlayer = 1
-        this.drawGrid()
-        canvas.addEventListener('mousedown', this.handleClick)
-      },
+        board.forEach(row => row.fill(0))
+        currentPlayer = 1
+        drawGrid()
+        canvas.addEventListener('mousedown', handleClick)
+      }
 
-      endGame() {
+      const endGame = () => {
         const canvas = document.getElementById('game-canvas')
         const ctx = canvas.getContext('2d')
-        canvas.removeEventListener('mousedown', this.handleClick)
+        canvas.removeEventListener('mousedown', handleClick)
         ctx.clearRect(0, 0, canvas.width, canvas.height)
-      },
+      }
 
-      canvas.addEventListener('mousedown', this.handleClick)
-      this.drawGrid()
+      canvas.addEventListener('mousedown', handleClick)
+      drawGrid()
     }
   }
 }

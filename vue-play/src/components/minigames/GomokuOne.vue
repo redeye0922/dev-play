@@ -102,7 +102,7 @@ export default {
             if (board[y][x] === 0) {
               // 각 위치에 돌을 놓고 점수를 계산
               board[y][x] = currentPlayer
-              let score = evaluateBoard(x, y, currentPlayer)
+              let score = evaluateBoard(x, y)
               board[y][x] = 0
 
               if (score > maxScore) {
@@ -127,7 +127,7 @@ export default {
         }
       }
 
-      const evaluateBoard = (x, y, player) => {
+      const evaluateBoard = (x, y) => {
         // 간단한 평가 함수: 연속된 돌의 개수를 기반으로 점수 계산
         let score = 0
         const directions = [

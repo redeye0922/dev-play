@@ -2,6 +2,8 @@
   <div id="game-container">
     <h1>Gomoku Game with Brython</h1>
     <canvas id="game-canvas" width="600" height="600"></canvas>
+    <button @click="restartGame">Restart</button>
+    <button @click="endGame">End</button>
   </div>
 </template>
 
@@ -73,8 +75,8 @@ export default {
 
       const handleClick = event => {
         const rect = canvas.getBoundingClientRect()
-        const x = Math.floor((event.clientX - rect.left - 20) / 40)
-        const y = Math.floor((event.clientY - rect.top - 20) / 40)
+        const x = Math.floor((event.clientX - rect.left) / 40)
+        const y = Math.floor((event.clientY - rect.top) / 40)
         if (x >= 0 && x < 15 && y >= 0 && y < 15 && board[y][x] === 0) {
           board[y][x] = currentPlayer
           drawStone(x, y, currentPlayer)
@@ -86,6 +88,19 @@ export default {
           }
           currentPlayer = 3 - currentPlayer
         }
+      }
+
+      const restartGame = () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+        board.forEach(row => row.fill(0))
+        currentPlayer = 1
+        drawGrid()
+        canvas.addEventListener('mousedown', handleClick)
+      }
+
+      const endGame = () => {
+        canvas.removeEventListener('mousedown', handleClick)
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
       }
 
       canvas.addEventListener('mousedown', handleClick)

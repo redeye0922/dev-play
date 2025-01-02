@@ -236,4 +236,7 @@ export default {
 button {
   font-size: 16px;
 }
+#game-canvas {
+  border: 1px solid black;
+}
 </style>

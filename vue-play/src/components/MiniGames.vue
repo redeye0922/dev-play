@@ -6,6 +6,7 @@
       <li><router-link to="/minigames/avoid-obstacles">Avoid Obstacles</router-link></li>
       <li><router-link to="/minigames/brick-breaker">Brick Breaker</router-link></li>
       <li><router-link to="/minigames/gomoku">Gomoku</router-link></li>
+      <li><router-link to="/minigames/gomoku-one">Gomoku One</router-link></li>
       <!-- <li><router-link to="/minigames/tetris-game">Tetris Game</router-link></li> -->
     </ul>
   </div>

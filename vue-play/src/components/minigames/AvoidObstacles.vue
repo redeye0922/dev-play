@@ -136,26 +136,26 @@ export default {
       console.log(`Cleaning up from ${source}`);
       clearTimeout(this.intervalId);
       this.intervalId = null;
-
+    
       document.removeEventListener('keydown', this.handleKeydown);
-
+    
       // Brython 관련 리소스를 정리합니다.
       const brythonScripts = document.querySelectorAll('script[src*="brython"]');
       brythonScripts.forEach(script => script.remove());
       const brythonStdlibScripts = document.querySelectorAll('script[src*="brython_stdlib"]');
       brythonStdlibScripts.forEach(script => script.remove());
-
+    
       // Brython 관련 DOM 요소도 제거합니다.
       const brythonElems = document.querySelectorAll('[type="text/python"]');
       brythonElems.forEach(elem => elem.remove());
-
+    
       // Brython 객체를 제거합니다.
       if (typeof window.__BRYTHON__ !== 'undefined') {
         window.__BRYTHON__.$options = null;
         window.__BRYTHON__.stdlib_path = null;
         window.__BRYTHON__.py_namespaces = null;
       }
-
+    
       console.log("Cleanup 완료");
     }
   }

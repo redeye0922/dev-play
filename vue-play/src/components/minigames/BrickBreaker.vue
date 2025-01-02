@@ -130,7 +130,13 @@ export default {
               row[row.indexOf(brick)] = null
               ball_dy *= -1
               score += 10
-              document.getElementById('score').textContent = `Score: ${score}`
+              const scoreElement = document.getElementById('score');
+              if (scoreElement) {
+                scoreElement.textContent = `Score: ${score}`
+              } else{
+                console.error('Score element not found in the DOM.');
+              }
+              //document.getElementById('score').textContent = `Score: ${score}`
             }
           }
         }

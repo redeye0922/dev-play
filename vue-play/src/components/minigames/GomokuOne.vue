@@ -234,6 +234,6 @@ export default {
   align-items: center;
 }
 #game-canvas {
-  border: 1px
+  border: 1px solid black;
 }
 </style>

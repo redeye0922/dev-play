@@ -1,6 +1,6 @@
 <template>
   <div id="game-container">
-    <h1>브라이썬을 이용한 오목 게임</h1>
+    <h1>Gomoku Game with Brython Single Play</h1>
     <canvas id="game-canvas" width="600" height="600"></canvas>
   </div>
 </template>

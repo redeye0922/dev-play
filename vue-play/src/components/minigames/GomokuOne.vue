@@ -97,13 +97,12 @@ export default {
         let maxScore = -1
         let possibleMoves = []
 
-        const userThreat = getUserThreat()
-        if (userThreat) {
-          bestMove = userThreat
-        } else {
-          for (let y = 0; y < 15; y++) {
-            for (let x = 0; x < 15; x++) {
-              if (board[y][x] === 0) {
+        // 우선순위: 플레이어의 돌 근처에 돌을 놓기
+        const userLastMove = getLastUserMove()
+        if (userLastMove) {
+          for (let y = userLastMove.y - 1; y <= userLastMove.y + 1; y++) {
+            for (let x = userLastMove.x - 1; x <= userLastMove.x + 1; x++) {
+              if (x >= 0 && x < 15 && y >= 0 && y < 15 && board[y][x] === 0) {
                 board[y][x] = currentPlayer
                 let score = evaluateMove(x, y)
                 board[y][x] = 0
@@ -113,7 +112,33 @@ export default {
                   bestMove = { x, y }
                   possibleMoves = [{ x, y }]
                 } else if (score === maxScore) {
-                  possibleMoves.push({ x, y })
+                  possibleMoves.push({ x, y }]
+                }
+              }
+            }
+          }
+        }
+
+        // 방어 우선: 플레이어의 3개 연속 돌을 막기
+        if (!bestMove) {
+          const userThreat = getUserThreat()
+          if (userThreat) {
+            bestMove = userThreat
+          } else {
+            for (let y = 0; y < 15; y++) {
+              for (let x = 0; x < 15; x++) {
+                if (board[y][x] === 0) {
+                  board[y][x] = currentPlayer
+                  let score = evaluateMove(x, y)
+                  board[y][x] = 0
+
+                  if (score > maxScore) {
+                    maxScore = score
+                    bestMove = { x, y }
+                    possibleMoves = [{ x, y }]
+                  } else if (score === maxScore) {
+                    possibleMoves.push({ x, y }]
+                  }
                 }
               }
             }
@@ -209,6 +234,4 @@ export default {
   align-items: center;
 }
 #game-canvas {
-  border: 1px solid black;
-}
-</style>
+  border: 1px

@@ -235,3 +235,4 @@ export default {
 }
 #game-canvas {
   border: 1px
+}

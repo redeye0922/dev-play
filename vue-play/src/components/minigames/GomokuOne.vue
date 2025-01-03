@@ -159,7 +159,7 @@ export default {
       const countStonesThreat = (x, y, dx, dy, player) => {
         let count = 0
         let empty = 0
-        for (let i = -3; i <= 3; i++) {
+        for (let i = -4; i <= 4; i++) {
           const nx = x + i * dx
           const ny = y + i * dy
           if (nx >= 0 && nx < 15 && ny >= 0 && ny < 15) {
@@ -169,7 +169,7 @@ export default {
               empty++
             }
           }
-          if (count >= 3 && empty >= 1) {
+          if ((count === 3 || count === 4) && empty >= 1) {
             return true
           }
         }

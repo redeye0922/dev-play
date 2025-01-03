@@ -56,12 +56,11 @@ export default {
           [1, 0], [0, 1], [1, 1], [1, -1]
         ]
         return directions.some(([dx, dy]) => {
-          return countStones(x, y, dx, dy) + countStones(x, y, -dx, -dy) - 1 >= 5
+          return countStones(x, y, dx, dy, board[y][x]) + countStones(x, y, -dx, -dy, board[y][x]) - 1 >= 5
         })
       }
 
-      const countStones = (x, y, dx, dy) => {
-        const player = board[y][x]
+      const countStones = (x, y, dx, dy, player) => {
         let count = 0
         while (x >= 0 && x < 15 && y >= 0 && y < 15 && board[y][x] === player) {
           count++
@@ -105,7 +104,7 @@ export default {
             for (let x = 0; x < 15; x++) {
               if (board[y][x] === 0) {
                 board[y][x] = currentPlayer
-                let score = evaluateMove(x, y)
+                let score = evaluateMove(x, y, currentPlayer)
                 board[y][x] = 0
 
                 if (score > maxScore) {
@@ -143,7 +142,7 @@ export default {
         const directions = [
           [1, 0], [0, 1], [1, 1], [1, -1]
         ]
-      
+
         for (let y = 0; y < 15; y++) {
           for (let x = 0; x < 15; x++) {
             if (board[y][x] === 0) {
@@ -160,11 +159,11 @@ export default {
         let count = 0
         let emptyStart = false
         let emptyEnd = false
-      
+
         for (let i = -4; i <= 4; i++) {
           const nx = x + i * dx
           const ny = y + i * dy
-      
+
           if (nx >= 0 && nx < 15 && ny >= 0 && ny < 15) {
             if (board[ny][nx] === player) {
               count++
@@ -184,7 +183,7 @@ export default {
             emptyStart = false
             emptyEnd = false
           }
-      
+
           if ((count === 4 && (emptyStart || emptyEnd)) || (count === 3 && emptyStart && emptyEnd)) {
             return true
           }
@@ -192,25 +191,17 @@ export default {
         return false
       }
 
-      const evaluateMove = (x, y) => {
+      const evaluateMove = (x, y, player) => {
         let score = 0
         const directions = [
           [1, 0], [0, 1], [1, 1], [1, -1]
         ]
 
         directions.forEach(([dx, dy]) => {
-          let count = countStones(x, y, dx, dy) + countStones(x, y, -dx, -dy) - 1
-          score += count
-          if (countStones(x, y, dx, dy) > 0 || countStones(x, y, -dx, -dy) > 0) {
-            score += 10
-          }
+          let playerCount = countStones(x, y, dx, dy, player) + countStones(x, y, -dx, -dy, player) - 1
+          let opponentCount = countStones(x, y, dx, dy, 3 - player) + countStones(x, y, -dx, -dy, 3 - player) - 1
+          score += playerCount * playerCount * playerCount - opponentCount * opponentCount
         })
-
-        const userLastMove = getLastUserMove()
-        if (userLastMove) {
-          const distance = Math.abs(x - userLastMove.x) + Math.abs(y - userLastMove.y)
-          score += 100 - distance
-        }
 
         return score
       }

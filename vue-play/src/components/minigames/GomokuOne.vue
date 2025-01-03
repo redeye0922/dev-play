@@ -206,17 +206,6 @@ export default {
         return score
       }
 
-      const getLastUserMove = () => {
-        for (let y = 0; y < 15; y++) {
-          for (let x = 0; x < 15; x++) {
-            if (board[y][x] === 1) {
-              return { x, y }
-            }
-          }
-        }
-        return null
-      }
-
       canvas.addEventListener('mousedown', handleClick)
       drawGrid()
     }

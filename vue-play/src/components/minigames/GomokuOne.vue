@@ -143,7 +143,7 @@ export default {
         const directions = [
           [1, 0], [0, 1], [1, 1], [1, -1]
         ]
-
+      
         for (let y = 0; y < 15; y++) {
           for (let x = 0; x < 15; x++) {
             if (board[y][x] === 0) {
@@ -158,19 +158,35 @@ export default {
 
       const countStonesThreat = (x, y, dx, dy, player) => {
         let count = 0
-        let empty = 0
+        let emptyStart = false
+        let emptyEnd = false
+      
         for (let i = -4; i <= 4; i++) {
           const nx = x + i * dx
           const ny = y + i * dy
+      
           if (nx >= 0 && nx < 15 && ny >= 0 && ny < 15) {
             if (board[ny][nx] === player) {
               count++
             } else if (board[ny][nx] === 0) {
-              empty++
+              if (count === 0) {
+                emptyStart = true
+              } else {
+                emptyEnd = true
+              }
+            } else {
+              count = 0
+              emptyStart = false
+              emptyEnd = false
             }
+          } else {
+            count = 0
+            emptyStart = false
+            emptyEnd = false
           }
-          if ((count === 4 && empty >= 1) || (count === 3 && empty >= 2)) { 
-            return true 
+      
+          if ((count === 4 && (emptyStart || emptyEnd)) || (count === 3 && emptyStart && emptyEnd)) {
+            return true
           }
         }
         return false

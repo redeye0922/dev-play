@@ -112,7 +112,7 @@ export default {
                   bestMove = { x, y }
                   possibleMoves = [{ x, y }]
                 } else if (score === maxScore) {
-                  possibleMoves.push({ x, y }]
+                  possibleMoves.push({ x, y })
                 }
               }
             }
@@ -137,7 +137,7 @@ export default {
                     bestMove = { x, y }
                     possibleMoves = [{ x, y }]
                   } else if (score === maxScore) {
-                    possibleMoves.push({ x, y }]
+                    possibleMoves.push({ x, y })
                   }
                 }
               }

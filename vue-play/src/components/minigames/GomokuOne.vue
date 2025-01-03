@@ -169,8 +169,8 @@ export default {
               empty++
             }
           }
-          if ((count === 3 || count === 4) && empty >= 1) {
-            return true
+          if ((count === 4 && empty >= 1) || (count === 3 && empty >= 2)) { 
+            return true 
           }
         }
         return false

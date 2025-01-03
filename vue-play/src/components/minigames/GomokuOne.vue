@@ -140,25 +140,40 @@ export default {
       }
 
       const getUserThreat = () => {
+        const directions = [
+          [1, 0], [0, 1], [1, 1], [1, -1]
+        ]
+
         for (let y = 0; y < 15; y++) {
           for (let x = 0; x < 15; x++) {
-            if (board[y][x] === 0 && hasUserThreat(x, y)) {
-              return { x, y }
+            if (board[y][x] === 0) {
+              if (directions.some(([dx, dy]) => countStonesThreat(x, y, dx, dy, 1))) {
+                return { x, y }
+              }
             }
           }
         }
         return null
       }
 
-      const hasUserThreat = (x, y) => {
-        const directions = [
-          [1, 0], [0, 1], [1, 1], [1, -1]
-        ]
-        return directions.some(([dx, dy]) => {
-          const startCount = countStones(x - dx, y - dy, -dx, -dy)
-          const endCount = countStones(x + dx, y + dy, dx, dy)
-          return (startCount + endCount - 1 >= 3) && (startCount >= 1 || endCount >= 1)
-        })
+      const countStonesThreat = (x, y, dx, dy, player) => {
+        let count = 0
+        let empty = 0
+        for (let i = -3; i <= 3; i++) {
+          const nx = x + i * dx
+          const ny = y + i * dy
+          if (nx >= 0 && nx < 15 && ny >= 0 && ny < 15) {
+            if (board[ny][nx] === player) {
+              count++
+            } else if (board[ny][nx] === 0) {
+              empty++
+            }
+          }
+          if (count >= 3 && empty >= 1) {
+            return true
+          }
+        }
+        return false
       }
 
       const evaluateMove = (x, y) => {

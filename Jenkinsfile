@@ -104,7 +104,7 @@ pipeline {
             steps {
                 script {
                     echo 'Docker 이미지 빌드 중...'
-                    sh "DOCKER_CONTENT_TRUST=0 docker build --build-arg DOCKER_REGISTRY=${DOCKER_REGISTRY} --build-arg IMAGE_NAME=${IMAGE_NAME} --build-arg DOCKER_IMAGE_TAG=${DOCKER_IMAGE_TAG} -t ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} ."
+                    sh "DOCKER_CONTENT_TRUST=0 docker build --no-cache --build-arg DOCKER_REGISTRY=${DOCKER_REGISTRY} --build-arg IMAGE_NAME=${IMAGE_NAME} --build-arg DOCKER_IMAGE_TAG=${DOCKER_IMAGE_TAG} -t ${DOCKER_REGISTRY}/${IMAGE_NAME}:${DOCKER_IMAGE_TAG} ."
                 }
             }
         }

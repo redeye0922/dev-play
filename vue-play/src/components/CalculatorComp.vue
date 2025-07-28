@@ -13,6 +13,16 @@
     <button style="grid-area: divide" @click="append('/')">÷</button>
     <button style="grid-area: equal" @click="calculate">=</button>
 
+    <button 
+      v-for="number in numbers"
+      :key="number"
+      :style="'grid-area: number-' +number"
+      @click="append(number)"
+    >
+    {{ number }}  
+   </button>
+
+    <!--
     <button style="grid-area: number-1" @click="append(1)">1</button>
     <button style="grid-area: number-2" @click="append(2)">2</button>
     <button style="grid-area: number-3" @click="append(3)">3</button>
@@ -23,7 +33,7 @@
     <button style="grid-area: number-8" @click="append(8)">8</button>
     <button style="grid-area: number-9" @click="append(9)">9</button>
     <button style="grid-area: number-0" @click="append(0)">0</button>
-
+    -->
     <button style="grid-area: dot" @click="append('.')">.</button>
   </div>
 </template>
@@ -36,6 +46,7 @@ export default {
       isDecimalAdded: false,
       isOperatorAdded: false,
       isStarted: false,
+      numbers: [1, 2, 3, 4, 5, 6, 7, 8, 9, 0],
     };
   },
   methods: {
